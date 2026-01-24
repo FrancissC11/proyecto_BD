@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta | Belleza & Estilo</title>
+    <link rel="stylesheet" href="/css/user.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="brand">Belleza & Estilo</div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <span>Hola, <b>Francis</b></span>
+            <a href="/" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Salir</a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <section id="view-dashboard" class="view-section active">
+            <div class="welcome-card">
+                <h1>Tu Panel de Citas</h1>
+                <p>Gestiona tus próximos tratamientos de belleza.</p>
+            </div>
+
+            <h3 style="margin-bottom: 1rem;">Historial Reciente</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h2 style="color: var(--success);">1</h2>
+                    <p>Futura (Mañana)</p>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--gray);">
+                    <h2 style="color: var(--gray);">4</h2>
+                    <p>Pasadas</p>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--danger);">
+                    <h2 style="color: var(--danger);">0</h2>
+                    <p>Canceladas</p>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 1rem; margin-top: 2rem;">¿Qué deseas hacer?</h3>
+            <div class="action-buttons">
+                <button class="btn-main btn-book" onclick="navegar('view-agendar')">
+                    <i class="fas fa-calendar-plus"></i> Agendar Nueva Cita
+                </button>
+                <button class="btn-main btn-reschedule" onclick="cargarCitasParaReagendar()">
+                    <i class="fas fa-sync-alt"></i> Reagendar Cita
+                </button>
+                <button class="btn-main btn-cancel" onclick="cargarCitasParaCancelar()">
+                    <i class="fas fa-calendar-times"></i> Cancelar Cita
+                </button>
+            </div>
+        </section>
+
+
+        <section id="view-agendar" class="view-section">
+            <button class="btn-back" onclick="navegar('view-dashboard')">← Volver al inicio</button>
+            
+            <div class="form-card">
+                <h2 style="text-align: center; margin-bottom: 1.5rem;">Reservar Cita</h2>
+                
+                <form id="formAgendar" onsubmit="confirmarAgendamiento(event)">
+                    <div class="form-group">
+                        <label>Fecha de Preferencia</label>
+                        <input type="date" class="form-control" required min="2026-01-24">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Especialidad</label>
+                        <select id="selectEspecialidad" class="form-control" onchange="cargarEmpleados()" required>
+                            <option value="">-- Selecciona --</option>
+                            <option value="capilar">Cuidado Capilar</option>
+                            <option value="manicura">Manicura & Pedicura</option>
+                            <option value="facial">Tratamientos Faciales</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Profesional Disponible</label>
+                        <select id="selectEmpleado" class="form-control" required disabled>
+                            <option value="">-- Primero elige especialidad --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Horario Disponible</label>
+                        <select class="form-control" required>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="17:00">05:00 PM</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-main btn-book" style="width: 100%;">Confirmar Reserva</button>
+                </form>
+            </div>
+        </section>
+
+
+        <section id="view-cancelar" class="view-section">
+            <button class="btn-back" onclick="navegar('view-dashboard')">← Volver al inicio</button>
+            
+            <h2 style="margin-bottom: 1.5rem;">Citas Pendientes</h2>
+            <p style="margin-bottom: 2rem; color: #888;">Selecciona la cita que deseas cancelar.</p>
+
+            <div id="lista-cancelar">
+                </div>
+        </section>
+
+
+        <section id="view-reagendar-lista" class="view-section">
+            <button class="btn-back" onclick="navegar('view-dashboard')">← Volver al inicio</button>
+            <h2 style="margin-bottom: 1.5rem;">Selecciona para Reagendar</h2>
+            <div id="lista-reagendar">
+                </div>
+        </section>
+
+        <section id="view-reagendar-form" class="view-section">
+            <button class="btn-back" onclick="navegar('view-reagendar-lista')">← Volver a lista</button>
+            
+            <div class="form-card">
+                <h2 style="text-align: center; margin-bottom: 1rem;">Modificar Cita</h2>
+                <p style="text-align: center; color: #888; font-size: 0.9rem; margin-bottom: 2rem;">
+                    Solo puedes cambiar fecha, hora y profesional.
+                </p>
+
+                <form onsubmit="confirmarReagendamiento(event)">
+                    <div class="form-group">
+                        <label>Especialidad (No editable)</label>
+                        <input type="text" class="form-control" value="Cuidado Capilar" disabled style="background: #eee;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nueva Fecha</label>
+                        <input type="date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Profesional</label>
+                        <select class="form-control">
+                            <option>Ana López (Actual)</option>
+                            <option>Marta Sánchez</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nuevo Horario</label>
+                        <select class="form-control">
+                            <option>09:00 AM</option>
+                            <option>04:00 PM</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-main btn-reschedule" style="width: 100%;">Guardar Cambios</button>
+                </form>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. NAVEGACIÓN SIMPLE ---
+        function navegar(viewId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            // Mostrar la deseada
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        // --- 2. LÓGICA DE AGENDAR (Carga de empleados) ---
+        const empleadosDB = {
+            'capilar': ['Ana López', 'Marta Sánchez'],
+            'manicura': ['Sofia Ruiz', 'Elena Gómez'],
+            'facial': ['Laura Torres']
+        };
+
+        function cargarEmpleados() {
+            const especialidad = document.getElementById('selectEspecialidad').value;
+            const selectEmpleado = document.getElementById('selectEmpleado');
+            
+            selectEmpleado.innerHTML = '<option value="">-- Selecciona Profesional --</option>';
+            selectEmpleado.disabled = true;
+
+            if (especialidad && empleadosDB[especialidad]) {
+                selectEmpleado.disabled = false;
+                empleadosDB[especialidad].forEach(emp => {
+                    const option = document.createElement('option');
+                    option.text = emp;
+                    option.value = emp;
+                    selectEmpleado.add(option);
+                });
+            }
+        }
+
+        function confirmarAgendamiento(e) {
+            e.preventDefault();
+            alert("¡Cita agendada con éxito! Te esperamos.");
+            navegar('view-dashboard');
+        }
+
+        // --- 3. LÓGICA DE CANCELAR (Mock Data) ---
+        const misCitasMock = [
+            { id: 1, servicio: 'Corte y Peinado', fecha: '25/01/2026', hora: '10:00 AM', pro: 'Ana López' },
+            { id: 2, servicio: 'Manicura Gel', fecha: '28/01/2026', hora: '03:00 PM', pro: 'Sofia Ruiz' }
+        ];
+
+        function cargarCitasParaCancelar() {
+            const contenedor = document.getElementById('lista-cancelar');
+            contenedor.innerHTML = ''; // Limpiar
+
+            misCitasMock.forEach(cita => {
+                contenedor.innerHTML += `
+                    <div class="appointment-item danger-border">
+                        <div>
+                            <strong>${cita.servicio}</strong><br>
+                            <small>${cita.fecha} - ${cita.hora} con ${cita.pro}</small>
+                        </div>
+                        <button class="btn-main btn-cancel" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="confirmarCancelacion(${cita.id})">
+                            Cancelar
+                        </button>
+                    </div>
+                `;
+            });
+            navegar('view-cancelar');
+        }
+
+        function confirmarCancelacion(id) {
+            if(confirm("¿Estás seguro que deseas cancelar esta cita? Esta acción no se puede deshacer.")) {
+                alert("Cita #" + id + " cancelada correctamente.");
+                navegar('view-dashboard');
+            }
+        }
+
+        // --- 4. LÓGICA DE REAGENDAR ---
+        function cargarCitasParaReagendar() {
+            const contenedor = document.getElementById('lista-reagendar');
+            contenedor.innerHTML = ''; 
+
+            misCitasMock.forEach(cita => {
+                contenedor.innerHTML += `
+                    <div class="appointment-item">
+                        <div>
+                            <strong>${cita.servicio}</strong><br>
+                            <small>${cita.fecha} - ${cita.hora}</small>
+                        </div>
+                        <button class="btn-main btn-reschedule" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="irAFormularioReagendar('${cita.servicio}')">
+                            Modificar
+                        </button>
+                    </div>
+                `;
+            });
+            navegar('view-reagendar-lista');
+        }
+
+        function irAFormularioReagendar(servicio) {
+            // Aquí en un sistema real, cargaríamos los datos de esa cita en el form
+            navegar('view-reagendar-form');
+        }
+
+        function confirmarReagendamiento(e) {
+            e.preventDefault();
+            alert("Tu cita ha sido reprogramada exitosamente.");
+            navegar('view-dashboard');
+        }
+    </script>
+</body>
+</html>

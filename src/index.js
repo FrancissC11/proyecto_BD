@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -12,7 +13,23 @@ app.use(express.static('public'));
 
 // Ruta de prueba
 app.get('/', (req, res) => {
-    res.send('¡Hola! El servidor está funcionando correctamente.');
+    // __dirname es la carpeta src actual, subimos un nivel si fuera necesario, 
+    // pero aquí concatenamos directo hacia views
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+// RUTA USUARIO (CLIENTE)
+app.get('/user', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'user.html'));
+});
+
+// RUTA GERENTE DE SUCURSAL
+app.get('/manager', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'manager.html'));
 });
 
 // Iniciar el servidor

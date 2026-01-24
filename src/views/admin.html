@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo | Belleza & Estilo</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <h2>Belleza & Estilo</h2>
+        </div>
+        
+        <nav>
+            <button class="menu-btn active" onclick="showPanel('sucursales', this)">
+                <i class="fas fa-store-alt"></i> Sucursales
+            </button>
+            
+            <button class="menu-btn" onclick="showPanel('inventarios', this)">
+                <i class="fas fa-boxes"></i> Inventarios
+            </button>
+            
+            <button class="menu-btn" onclick="showPanel('talento', this)">
+                <i class="fas fa-users"></i> Talento Humano
+            </button>
+        </nav>
+        
+        <div style="margin-top: auto;">
+            <a href="/" style="color: #999; text-decoration: none; font-size: 0.9rem; padding-left: 1rem;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+        </div>
+    </aside>
+
+
+    <main class="main-content">
+
+        <section id="sucursales" class="panel-section active">
+            <h1 class="section-title">Nuestras Sucursales</h1>
+            
+            <div class="branch-grid">
+                <div class="branch-card">
+                    <h3>Sucursal Centro</h3>
+                    <p style="color:#888; font-size: 0.9rem;">Av. Principal 123</p>
+                </div>
+                <div class="branch-card">
+                    <h3>Sucursal Norte</h3>
+                    <p style="color:#888; font-size: 0.9rem;">Plaza Mayor</p>
+                </div>
+                <div class="branch-card">
+                    <h3>Sucursal Sur</h3>
+                    <p style="color:#888; font-size: 0.9rem;">C.C. Las Flores</p>
+                </div>
+            </div>
+
+            <div class="branch-details">
+                <div class="manager-info">
+                    <h4>Gerente a Cargo</h4>
+                    <div class="avatar"></div> <h3>Ana López</h3>
+                    <p style="color: var(--primary-dark); font-size: 0.9rem;">Gerente Senior</p>
+                </div>
+                <div class="employee-list">
+                    <h4 style="margin-bottom: 1rem;">Equipo de Trabajo (Sucursal Centro)</h4>
+                    <ul style="list-style: none;">
+                        <li style="padding: 0.8rem 0; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center;">
+                            <i class="fas fa-cut" style="margin-right: 10px; color: #d4a5a5;"></i> Carla Méndez - Estilista
+                        </li>
+                        <li style="padding: 0.8rem 0; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center;">
+                            <i class="fas fa-hand-sparkles" style="margin-right: 10px; color: #d4a5a5;"></i> Sofia Ruiz - Manicurista
+                        </li>
+                        <li style="padding: 0.8rem 0; display: flex; align-items: center;">
+                            <i class="fas fa-user-clock" style="margin-right: 10px; color: #d4a5a5;"></i> Laura T. - Recepción
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="inventarios" class="panel-section">
+            <h1 class="section-title">Gestión de Inventarios</h1>
+            
+            <div class="inventory-selector-container">
+                <label for="sucursalSelect">Selecciona una sucursal para gestionar su stock:</label>
+                <div class="custom-select-wrapper">
+                    <select id="sucursalSelect" onchange="mostrarInventario(this.value)">
+                        <option value="" selected disabled>-- Elige una Sucursal --</option>
+                        <option value="centro">Sucursal Centro</option>
+                        <option value="norte">Sucursal Norte</option>
+                        <option value="sur">Sucursal Sur</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="inventory-table-container" style="display: none; margin-top: 3rem; animation: fadeIn 0.5s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 id="inventory-title" style="color: var(--text-color);">Resultados</h3>
+                    <button class="btn-action">
+                        <i class="fas fa-plus"></i> Nuevo Producto
+                    </button>
+                </div>
+
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Shampoo Keratina 500ml</td>
+                            <td>Capilar</td>
+                            <td>12 un.</td>
+                            <td style="color: green; font-weight: 600;">Disponible</td>
+                        </tr>
+                        <tr>
+                            <td>Tinte Rubio Cenizo 8.1</td>
+                            <td>Coloración</td>
+                            <td>2 un.</td>
+                            <td style="color: orange; font-weight: 600;">Bajo Stock</td>
+                        </tr>
+                        <tr>
+                            <td>Esmalte Gel Rojo Pasión</td>
+                            <td>Manicura</td>
+                            <td>0 un.</td>
+                            <td style="color: #d9534f; font-weight: 600;">Agotado</td>
+                        </tr>
+                        <tr>
+                            <td>Mascarilla Facial Hidratante</td>
+                            <td>Skin Care</td>
+                            <td>25 un.</td>
+                            <td style="color: green; font-weight: 600;">Disponible</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <section id="talento" class="panel-section">
+            <h1 class="section-title">Talento Humano</h1>
+            <div style="text-align: center; padding: 4rem; color: #999; background: white; border-radius: 12px;">
+                <i class="fas fa-user-tie" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);"></i>
+                <p>Módulo de Gestión de Gerentes en construcción.</p>
+            </div>
+        </section>
+
+    </main>
+
+
+    <script>
+        // Función 1: Cambiar entre Paneles del Sidebar
+        function showPanel(panelId, btn) {
+            // A. Ocultar todos los paneles
+            document.querySelectorAll('.panel-section').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            // B. Desactivar estilo "active" de todos los botones
+            document.querySelectorAll('.menu-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+
+            // C. Mostrar el panel elegido y activar su botón
+            document.getElementById(panelId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // Función 2: Mostrar Tabla de Inventario al elegir Sucursal
+        function mostrarInventario(sucursal) {
+            const tableContainer = document.getElementById('inventory-table-container');
+            const title = document.getElementById('inventory-title');
+
+            // Si el valor es vacío (placeholder), ocultamos todo
+            if (!sucursal) {
+                tableContainer.style.display = 'none';
+                return;
+            }
+
+            // Capitalizar la primera letra para que se vea bonito (norte -> Norte)
+            const nombreBonito = sucursal.charAt(0).toUpperCase() + sucursal.slice(1);
+            
+            // Actualizar título
+            title.innerText = `Inventario actual: Sucursal ${nombreBonito}`;
+
+            // Mostrar la tabla
+            tableContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

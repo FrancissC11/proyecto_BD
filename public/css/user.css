@@ -1,0 +1,133 @@
+/* public/css/user.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+    --primary: #d4a5a5;
+    --primary-dark: #b58383;
+    --bg-color: #f9f7f7;
+    --text: #4a4a4a;
+    --white: #ffffff;
+    --success: #81c784; /* Verde suave para citas futuras */
+    --gray: #9e9e9e;    /* Gris para pasadas */
+    --danger: #e57373;  /* Rojo suave para canceladas */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* --- HEADER --- */
+header {
+    background-color: var(--white);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-dark); }
+.btn-logout { text-decoration: none; color: var(--gray); font-size: 0.9rem; transition: 0.3s; }
+.btn-logout:hover { color: var(--danger); }
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+
+/* --- SECCIONES (Vistas) --- */
+.view-section { display: none; animation: fadeIn 0.4s ease; }
+.view-section.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- DASHBOARD HOME --- */
+.welcome-card {
+    background: linear-gradient(135deg, #d4a5a5 0%, #e8c6c6 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border-top: 4px solid var(--primary);
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.btn-main {
+    padding: 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-book { background-color: var(--primary); color: white; }
+.btn-reschedule { background-color: #fff; border: 2px solid var(--primary); color: var(--primary-dark); }
+.btn-cancel { background-color: var(--white); border: 1px solid #ddd; color: var(--danger); }
+
+.btn-main:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+/* --- FORMULARIOS --- */
+.form-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.form-control {
+    width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 8px;
+    font-family: 'Poppins', sans-serif; background: #fafafa;
+}
+.form-control:focus { outline: none; border-color: var(--primary); background: white; }
+
+.btn-back {
+    background: none; border: none; color: var(--gray); cursor: pointer; margin-bottom: 1rem;
+}
+.btn-back:hover { color: var(--text); }
+
+/* --- LISTAS DE CITAS (Para Cancelar/Reagendar) --- */
+.appointment-item {
+    background: var(--white);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--primary);
+}
+.danger-border { border-left-color: var(--danger); }
