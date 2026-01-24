@@ -1,0 +1,95 @@
+/* public/css/manager.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+    --primary: #d4a5a5;
+    --primary-dark: #b58383;
+    --bg-color: #f9f7f7;
+    --text: #4a4a4a;
+    --sidebar-bg: #ffffff;
+    --danger: #e57373;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- REUTILIZAMOS SIDEBAR (Igual que Admin) --- */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    padding: 2rem;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    display: flex; flex-direction: column;
+}
+
+.brand h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--text); margin-bottom: 3rem; text-align: center;
+}
+
+.menu-btn {
+    background: none; border: none; width: 100%; padding: 1rem;
+    text-align: left; font-size: 1rem; color: var(--text);
+    cursor: pointer; border-radius: 10px; margin-bottom: 0.5rem;
+    transition: 0.3s; font-family: 'Poppins', sans-serif;
+}
+.menu-btn:hover, .menu-btn.active { background-color: #fcebeb; color: var(--primary-dark); font-weight: 600; }
+
+/* --- CONTENIDO --- */
+.main-content { flex: 1; padding: 3rem; overflow-y: auto; }
+.section-title { font-family: 'Playfair Display', serif; margin-bottom: 2rem; }
+
+.panel-section { display: none; animation: fadeIn 0.5s ease; }
+.panel-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- TARJETAS DE EMPLEADOS --- */
+.employees-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
+}
+
+.employee-card {
+    background: white; padding: 1.5rem; border-radius: 12px;
+    text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-top: 4px solid var(--primary);
+    position: relative;
+}
+
+.emp-avatar {
+    width: 80px; height: 80px; background: #eee; border-radius: 50%;
+    margin: 0 auto 1rem; object-fit: cover;
+}
+
+.btn-fire {
+    margin-top: 1rem; padding: 0.5rem 1rem; border: 1px solid var(--danger);
+    background: white; color: var(--danger); border-radius: 6px; cursor: pointer;
+    font-size: 0.85rem; transition: 0.3s;
+}
+.btn-fire:hover { background: var(--danger); color: white; }
+
+/* --- FORMULARIO NUEVO EMPLEADO (Modal) --- */
+.form-container {
+    background: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;
+    border: 1px solid #eee; display: none; /* Oculto por defecto */
+}
+.form-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.input-std {
+    width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px;
+}
+.btn-save {
+    background: var(--primary); color: white; border: none; padding: 0.8rem 2rem;
+    border-radius: 8px; cursor: pointer;
+}
+
+/* --- TABLA INVENTARIO --- */
+.inventory-table {
+    width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden;
+}
+.inventory-table th, .inventory-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+.inventory-table th { background-color: #fcebeb; color: var(--primary-dark); }

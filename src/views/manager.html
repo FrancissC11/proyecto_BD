@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerencia | Sucursal Centro</title>
+    <link rel="stylesheet" href="/css/manager.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <h2>Belleza & Estilo</h2>
+            <p style="font-size: 0.8rem; color: #888; text-align: center; margin-top: -2rem; margin-bottom: 2rem;">
+                Gerencia: Sucursal Centro
+            </p>
+        </div>
+        <nav>
+            <button class="menu-btn active" onclick="showPanel('equipo', this)">
+                <i class="fas fa-users"></i> Mi Equipo
+            </button>
+            <button class="menu-btn" onclick="showPanel('inventario', this)">
+                <i class="fas fa-boxes"></i> Mi Inventario
+            </button>
+        </nav>
+        <div style="margin-top: auto;">
+            <a href="/" style="color: #999; text-decoration: none; font-size: 0.9rem; padding-left: 1rem;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <section id="equipo" class="panel-section active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="section-title">Gestión de Personal</h1>
+                <button class="btn-save" onclick="toggleForm()">
+                    <i class="fas fa-user-plus"></i> Registrar Empleado
+                </button>
+            </div>
+
+            <div id="form-registro" class="form-container">
+                <h3 style="margin-bottom: 1rem; color: var(--primary-dark);">Nuevo Ingreso</h3>
+                <form onsubmit="registrarEmpleado(event)">
+                    <div class="form-row">
+                        <input type="text" class="input-std" placeholder="Nombre Completo" required>
+                        <input type="text" class="input-std" placeholder="DNI / Cédula" required>
+                    </div>
+                    <div class="form-row">
+                        <select class="input-std" required>
+                            <option value="">Selecciona Cargo</option>
+                            <option>Estilista Senior</option>
+                            <option>Manicurista</option>
+                            <option>Asistente</option>
+                            <option>Recepción</option>
+                        </select>
+                        <input type="date" class="input-std" required>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="button" onclick="toggleForm()" style="background:none; border:none; color:#888; margin-right: 1rem; cursor:pointer;">Cancelar</button>
+                        <button type="submit" class="btn-save">Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="employees-grid">
+                <div class="employee-card">
+                    <img src="https://via.placeholder.com/80" class="emp-avatar" alt="Foto">
+                    <h3>Carla Méndez</h3>
+                    <p style="color: #888; font-size: 0.9rem;">Estilista Senior</p>
+                    <p style="font-size: 0.8rem; margin: 0.5rem 0; color: green;">● Activo</p>
+                    <button class="btn-fire" onclick="despedirEmpleado('Carla Méndez')">
+                        <i class="fas fa-user-times"></i> Despedir / Dar de baja
+                    </button>
+                </div>
+
+                <div class="employee-card">
+                    <img src="https://via.placeholder.com/80" class="emp-avatar" alt="Foto">
+                    <h3>Sofia Ruiz</h3>
+                    <p style="color: #888; font-size: 0.9rem;">Manicurista</p>
+                    <p style="font-size: 0.8rem; margin: 0.5rem 0; color: green;">● Activo</p>
+                    <button class="btn-fire" onclick="despedirEmpleado('Sofia Ruiz')">
+                        <i class="fas fa-user-times"></i> Despedir / Dar de baja
+                    </button>
+                </div>
+
+                <div class="employee-card">
+                    <img src="https://via.placeholder.com/80" class="emp-avatar" alt="Foto">
+                    <h3>Laura Torres</h3>
+                    <p style="color: #888; font-size: 0.9rem;">Asistente General</p>
+                    <p style="font-size: 0.8rem; margin: 0.5rem 0; color: green;">● Activo</p>
+                    <button class="btn-fire" onclick="despedirEmpleado('Laura Torres')">
+                        <i class="fas fa-user-times"></i> Despedir / Dar de baja
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="inventario" class="panel-section">
+            <h1 class="section-title">Inventario: Sucursal Centro</h1>
+            <p style="margin-bottom: 2rem; color: #666;">
+                Vista exclusiva de stock local. Para solicitar reabastecimiento contacte al Admin.
+            </p>
+
+            <table class="inventory-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Stock Local</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Shampoo Keratina 500ml</td>
+                        <td>Capilar</td>
+                        <td>12 un.</td>
+                        <td style="color: green; font-weight: 600;">Disponible</td>
+                    </tr>
+                    <tr>
+                        <td>Tinte Rubio Cenizo 8.1</td>
+                        <td>Coloración</td>
+                        <td>2 un.</td>
+                        <td style="color: orange; font-weight: 600;">Bajo Stock</td>
+                    </tr>
+                    <tr>
+                        <td>Toallas Microfibra</td>
+                        <td>Insumos</td>
+                        <td>45 un.</td>
+                        <td style="color: green; font-weight: 600;">Disponible</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <script>
+        // Cambiar pestañas
+        function showPanel(panelId, btn) {
+            document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // Mostrar/Ocultar formulario de registro
+        function toggleForm() {
+            const form = document.getElementById('form-registro');
+            if (form.style.display === 'block') {
+                form.style.display = 'none';
+            } else {
+                form.style.display = 'block';
+                // Pequeña animación visual
+                form.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Simular registro
+        function registrarEmpleado(e) {
+            e.preventDefault();
+            alert('Empleado registrado exitosamente en la base de datos de la sucursal.');
+            toggleForm();
+            // Aquí en el futuro recargaríamos la lista
+        }
+
+        // Simular despido
+        function despedirEmpleado(nombre) {
+            let confirmacion = confirm(`ADVERTENCIA:\n¿Estás seguro que deseas dar de baja a ${nombre}?\n\nEsta acción revocará su registro en la sucursal.`);
+            
+            if (confirmacion) {
+                alert(`El empleado ${nombre} ha sido dado de baja del sistema.`);
+                // Aquí en el futuro ocultaríamos la tarjeta o recargaríamos la página
+            }
+        }
+    </script>
+</body>
+</html>

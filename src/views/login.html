@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Belleza & Estilo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Estilos generales idénticos al tema de tu aplicación */
+        :root {
+            --primary: #d4a5a5;
+            --primary-dark: #b58383;
+            --bg-color: #f9f7f7;
+            --text: #4a4a4a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--text);
+        }
+
+        .login-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border-top: 5px solid var(--primary);
+        }
+
+        .brand-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem; /* Espacio para el icono */
+            border: 1px solid #eee;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Estilo para el enlace de registro */
+        .register-link {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .register-link p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-link a {
+            color: var(--primary-dark);
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1 class="brand-title">Belleza & Estilo</h1>
+        <p class="subtitle">Bienvenido al sistema de gestión</p>
+
+        <form action="/" method="POST">
+            
+            <div class="form-group">
+                <label for="cedula">Usuario / Cédula</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-id-card"></i>
+                    <input 
+                        type="text" 
+                        id="cedula" 
+                        name="cedula" 
+                        class="form-control" 
+                        placeholder="Ingrese su número de cédula" 
+                        required 
+                        autofocus
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="••••••••" 
+                        required
+                    >
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <div class="register-link">
+            <p>¿Eres un cliente nuevo?</p>
+            <a href="/register">
+                Regístrate aquí para agendar tu cita
+            </a>
+        </div>
+
+        <p class="footer-text">
+            &copy; 2026 Franquicia Estética
+        </p>
+    </div>
+
+</body>
+</html>

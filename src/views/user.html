@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | Belleza & Estilo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* ESTILOS (Mismos que Admin/Manager para coherencia visual) */
+        :root { --primary: #d4a5a5; --bg-color: #f9f7f7; --text: #4a4a4a; --sidebar-bg: #ffffff; --danger: #e57373; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); padding: 2rem; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        .brand h2 { font-family: 'Playfair Display', serif; margin-bottom: 2rem; text-align: center; color: var(--text); }
+        .menu-btn { width: 100%; padding: 1rem; border: none; background: none; text-align: left; cursor: pointer; color: var(--text); border-radius: 10px; margin-bottom: 0.5rem; transition: 0.3s; }
+        .menu-btn.active, .menu-btn:hover { background-color: #fcebeb; color: #b58383; font-weight: 600; }
+        
+        /* Contenido Principal */
+        .main-content { flex: 1; padding: 3rem; overflow-y: auto; }
+        .section-title { font-family: 'Playfair Display', serif; margin-bottom: 2rem; color: var(--text); }
+        
+        /* Tarjetas de Citas */
+        .cita-card { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .cita-info h4 { margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .cita-info p { font-size: 0.9rem; color: #666; margin-bottom: 0.3rem; }
+        .badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-success { background: #d4edda; color: #155724; }
+
+        /* Botones */
+        .btn-main { background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-main:hover { background: #b58383; }
+        .btn-cancel { background: white; border: 1px solid var(--danger); color: var(--danger); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; }
+        .btn-cancel:hover { background: var(--danger); color: white; }
+
+        /* Modal (Formulario Flotante) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 2.5rem; border-radius: 15px; width: 500px; max-width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .form-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 500; color: #666; }
+        .input-std { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; font-family: 'Poppins', sans-serif; outline: none; }
+        .input-std:focus { border-color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <h2>Belleza & Estilo</h2>
+            <p id="user-name-display" style="text-align: center; color: #888; font-size: 0.9rem;">Cargando...</p>
+        </div>
+        <nav>
+            <button class="menu-btn active"><i class="fas fa-calendar-alt"></i> Mis Citas</button>
+            <a href="/logout" class="menu-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1 class="section-title">Mis Citas Agendadas</h1>
+            <button class="btn-main" onclick="openModal()">
+                <i class="fas fa-plus"></i> Nueva Cita
+            </button>
+        </div>
+
+        <div id="citas-container">
+            <p style="color: #888;">Cargando historial...</p>
+        </div>
+    </main>
+
+    <div id="citaModal" class="modal">
+        <div class="modal-content">
+            <h2 class="section-title" style="margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem;">Reservar Turno</h2>
+            
+            <form action="/cita/save" method="POST">
+                <input type="hidden" name="id_cliente_hidden" id="id_cliente_input">
+
+                <div class="form-row">
+                    <div style="flex: 1;">
+                        <label>Sucursal</label>
+                        <select name="id_sucursal" id="sucursalSelect" class="input-std" required onchange="cargarEmpleados()">
+                            <option value="">Seleccione Sucursal</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Servicio</label>
+                        <select id="especialidadSelect" class="input-std" required onchange="cargarEmpleados()">
+                            <option value="">Seleccione Servicio</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label>Profesional</label>
+                    <select name="id_empleado" id="empleadoSelect" class="input-std" required onchange="cargarHoras()">
+                        <option value="">Primero seleccione sucursal y servicio</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div style="flex: 1;">
+                        <label>Fecha</label>
+                        <input type="date" name="fecha" id="fechaInput" class="input-std" required onchange="cargarHoras()">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Horario (Bloques 2h)</label>
+                        <select name="hora" id="horaSelect" class="input-std" required>
+                            <option value="">Seleccione Fecha</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Confirmar Reserva</button>
+                    <button type="button" onclick="closeModal()" style="background: none; border: none; color: #999; width: 100%; margin-top: 1rem; cursor: pointer; font-size: 0.9rem;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURACIÓN INICIAL ---
+        // Obtenemos el ID y Nombre del cliente desde la URL (que nos mandó el Login)
+        const params = new URLSearchParams(window.location.search);
+        const clientId = params.get('id');
+        const clientName = params.get('name');
+
+        if(clientName) document.getElementById('user-name-display').innerText = "Hola, " + clientName;
+        if(clientId) document.getElementById('id_cliente_input').value = clientId;
+
+        // --- 2. CARGAR COMBOS (Sucursales y Especialidades) AL INICIAR ---
+        async function loadFormData() {
+            try {
+                const response = await fetch('/api/form-data');
+                const data = await response.json();
+
+                // Llenar Sucursales
+                const sucSelect = document.getElementById('sucursalSelect');
+                data.sucursales.forEach(s => {
+                    sucSelect.innerHTML += `<option value="${s.id_sucursal}">${s.nombre}</option>`;
+                });
+
+                // Llenar Especialidades
+                const espSelect = document.getElementById('especialidadSelect');
+                data.especialidades.forEach(e => {
+                    espSelect.innerHTML += `<option value="${e.especialidad}">${e.especialidad}</option>`;
+                });
+                
+                // Cargar la lista de citas del usuario
+                loadMyAppointments();
+            } catch (error) {
+                console.error("Error cargando formulario:", error);
+            }
+        }
+
+        // --- 3. CARGAR EMPLEADOS (Filtrados) ---
+        async function cargarEmpleados() {
+            const idSucursal = document.getElementById('sucursalSelect').value;
+            const especialidad = document.getElementById('especialidadSelect').value;
+            const empSelect = document.getElementById('empleadoSelect');
+            
+            // Reiniciamos hora porque cambiaron los datos
+            document.getElementById('horaSelect').innerHTML = '<option value="">Seleccione Fecha</option>';
+            document.getElementById('fechaInput').value = ''; // Limpiar fecha
+
+            empSelect.innerHTML = '<option value="">Cargando...</option>';
+
+            if (idSucursal && especialidad) {
+                const res = await fetch(`/api/empleados?id_sucursal=${idSucursal}&especialidad=${especialidad}`);
+                const empleados = await res.json();
+
+                empSelect.innerHTML = '<option value="">Seleccione Profesional</option>';
+                if(empleados.length === 0) {
+                    empSelect.innerHTML += '<option disabled>No hay profesionales en esta sede</option>';
+                } else {
+                    empleados.forEach(emp => {
+                        empSelect.innerHTML += `<option value="${emp.id_empleado}">${emp.nombres} ${emp.apellidos}</option>`;
+                    });
+                }
+            } else {
+                empSelect.innerHTML = '<option value="">Seleccione sucursal y servicio primero</option>';
+            }
+        }
+
+        // --- 4. CARGAR HORAS (SLOTS) - LA MAGIA ---
+        async function cargarHoras() {
+            const idEmpleado = document.getElementById('empleadoSelect').value;
+            const fecha = document.getElementById('fechaInput').value;
+            const horaSelect = document.getElementById('horaSelect');
+
+            if (!idEmpleado || !fecha) {
+                horaSelect.innerHTML = '<option value="">Faltan datos</option>';
+                return;
+            }
+
+            horaSelect.innerHTML = '<option value="">Buscando disponibilidad...</option>';
+
+            try {
+                // Llamamos a la nueva API que calcula los bloques de 2h
+                const res = await fetch(`/api/slots?id_empleado=${idEmpleado}&fecha=${fecha}`);
+                const slots = await res.json();
+
+                horaSelect.innerHTML = '<option value="">Seleccione Hora</option>';
+
+                if (slots.length === 0) {
+                    horaSelect.innerHTML += '<option disabled>Sin turnos disponibles o día no laboral</option>';
+                } else {
+                    slots.forEach(hora => {
+                        horaSelect.innerHTML += `<option value="${hora}">${hora}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                horaSelect.innerHTML = '<option value="">Error al cargar</option>';
+            }
+        }
+
+        // --- 5. CARGAR MIS CITAS (HISTORIAL) ---
+        async function loadMyAppointments() {
+            if(!clientId) return;
+            const res = await fetch(`/api/mis-citas?id_cliente=${clientId}`);
+            const citas = await res.json();
+            const container = document.getElementById('citas-container');
+
+            if(citas.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 2rem;">
+                        <i class="far fa-calendar-times" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                        <p style="color:#888;">No tienes citas agendadas aún.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            citas.forEach(cita => {
+                // Formatear fecha para que se vea bonita
+                // Ajustamos la zona horaria para que no reste un día
+                const fechaObj = new Date(cita.fecha);
+                const userTimezoneOffset = fechaObj.getTimezoneOffset() * 60000;
+                const fechaCorrecta = new Date(fechaObj.getTime() + userTimezoneOffset);
+                const fechaStr = fechaCorrecta.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                
+                // Formatear hora (cortar segundos)
+                const horaStr = String(cita.hora).substring(0, 5); 
+
+                container.innerHTML += `
+                    <div class="cita-card">
+                        <div class="cita-info">
+                            <h4>${cita.sucursal} <span style="font-weight:400; font-size:0.9rem;">con ${cita.empleado}</span></h4>
+                            <p><i class="far fa-calendar"></i> ${fechaStr}</p>
+                            <p><i class="far fa-clock"></i> ${horaStr} (Duración: 2h)</p>
+                            <div style="margin-top:0.5rem;">
+                                <span class="badge ${cita.estado === 'Pendiente' ? 'badge-pending' : 'badge-success'}">${cita.estado}</span>
+                            </div>
+                        </div>
+                        <button class="btn-cancel" onclick="cancelarCita(${cita.id_cita})">
+                            <i class="fas fa-trash-alt"></i> Cancelar
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // --- 6. CANCELAR CITA ---
+        async function cancelarCita(idCita) {
+            if(!confirm('¿Estás seguro de cancelar esta cita? Esta acción liberará el horario.')) return;
+
+            const res = await fetch(`/api/cita/${idCita}`, { method: 'DELETE' });
+            const data = await res.json();
+
+            if(data.success) {
+                // Recargar la lista sin refrescar la página
+                loadMyAppointments(); 
+            } else {
+                alert('Hubo un error al cancelar la cita.');
+            }
+        }
+
+        // --- 7. UTILIDADES VISUALES ---
+        function setMinDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('fechaInput').setAttribute('min', `${yyyy}-${mm}-${dd}`);
+        }
+
+        function openModal() {
+            document.getElementById('citaModal').style.display = 'flex';
+            setMinDate(); // Bloquear fechas pasadas al abrir
+        }
+
+        function closeModal() {
+            document.getElementById('citaModal').style.display = 'none';
+        }
+
+        // Cerrar modal si hacen click afuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('citaModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Iniciar
+        loadFormData();
+    </script>
+</body>
+</html>

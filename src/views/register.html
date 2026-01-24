@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | Belleza & Estilo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #d4a5a5; --primary-dark: #b58383; --bg-color: #f9f7f7; --text: #4a4a4a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text); padding: 2rem 0; }
+        .login-container { background: white; padding: 2.5rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 500px; border-top: 5px solid var(--primary); }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text); text-align: center; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; font-weight: 500; color: #666; }
+        .form-control { width: 100%; padding: 0.7rem; border: 1px solid #eee; border-radius: 8px; font-family: 'Poppins', sans-serif; outline: none; }
+        .form-control:focus { border-color: var(--primary); }
+        .btn-login { width: 100%; padding: 0.9rem; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: 1rem; }
+        .btn-login:hover { background-color: var(--primary-dark); }
+        .row { display: flex; gap: 1rem; }
+        .col { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="brand-title">Crear Cuenta</h1>
+        <p style="text-align: center; color: #888; margin-bottom: 1.5rem; font-size: 0.9rem;">Únete a nuestra comunidad</p>
+
+        <form action="/register" method="POST">
+            
+            <div class="form-group">
+                <label>Cédula (Usuario)</label>
+                <input type="text" name="cedula" class="form-control" placeholder="Ej: 1712345678" required maxlength="10">
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label>Nombres</label>
+                    <input type="text" name="nombres" class="form-control" required>
+                </div>
+                <div class="col form-group">
+                    <label>Apellidos</label>
+                    <input type="text" name="apellidos" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label>Teléfono</label>
+                    <input type="text" name="telefono" class="form-control" placeholder="099..." maxlength="10">
+                </div>
+                <div class="col form-group">
+                    <label>Correo</label>
+                    <input type="email" name="correo" class="form-control" placeholder="juan@mail.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="contrasena" class="form-control" placeholder="Crea una contraseña segura" required>
+            </div>
+
+            <button type="submit" class="btn-login">Registrarse</button>
+            
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="/" style="font-size: 0.85rem; color: #888; text-decoration: none;">Volver al Login</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
