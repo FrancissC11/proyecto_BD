@@ -30,9 +30,11 @@ controller.login = async (req, res) => {
 
         if (user) {
             const rol = user.data.rol;
-            const userId = user.data.id; // Obtenemos el ID
+            const userId = user.data.id; // ID del empleado o cliente
 
-            // --- REDIRECCIÓN CON ID (Para que el frontend sepa quién es) ---
+            console.log(`Login exitoso: ${user.data.nombres} (${rol})`);
+
+            // --- REDIRECCIÓN POR ROLES ---
             switch (rol) {
                 case 'admin':
                     res.redirect(`/admin?id=${userId}`);
@@ -41,11 +43,15 @@ controller.login = async (req, res) => {
                     res.redirect(`/manager?id=${userId}`);
                     break;
                 case 'cliente':
-                    // Enviamos el ID en la URL
-                    res.redirect(`/user?id=${userId}&name=${user.data.nombres}`);
+                    // Enviamos nombre también para la bienvenida
+                    res.redirect(`/user?id=${userId}&name=${encodeURIComponent(user.data.nombres)}`);
+                    break;
+                case 'cajero':
+                    // AHORA REDIRIGIMOS CON ID PARA QUE EL CAJERO CARGUE SUS DATOS
+                    res.redirect(`/cashier?id=${userId}`);
                     break;
                 case 'empleado':
-                    res.send(`<h1>Bienvenido ${user.data.nombres}</h1><p>Panel en construcción.</p>`);
+                    res.send(`<h1>Bienvenido ${user.data.nombres}</h1><p>Panel de Estilista en construcción.</p>`);
                     break;
                 default:
                     res.redirect('/');
@@ -55,6 +61,7 @@ controller.login = async (req, res) => {
         }
 
     } catch (error) {
+        console.error('Error en login:', error);
         res.status(500).send('Error del servidor');
     }
 };
