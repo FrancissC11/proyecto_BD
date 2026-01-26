@@ -14,6 +14,7 @@ const adminController = require('./controllers/adminController');
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || '127.0.0.1';
 
 // --- MIDDLEWARES ---
 app.use(express.json());
@@ -25,7 +26,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // ================= RUTAS =================
 
 // --- 1. AUTENTICACIÓN ---
-app.get('/', authController.showLogin); 
+app.get('/', authController.showLogin);
 app.post('/', authController.login);
 app.get('/register', authController.showRegister);
 app.post('/register', authController.register);
@@ -91,7 +92,6 @@ getConnection().then((pool) => {
     }
 }).catch(err => console.error('Error fatal de conexión:', err));
 
-// 2. Iniciar Servidor
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
+app.listen(port, host, () => {
+    console.log(`Servidor corriendo en http://${host}:${port}`);
 });
