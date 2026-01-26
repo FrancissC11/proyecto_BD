@@ -7,7 +7,8 @@ const { getConnection } = require('./config/db');
 const authController = require('./controllers/authController');
 const appointmentController = require('./controllers/appointmentController');
 const cashierController = require('./controllers/cashierController');
-const managerController = require('./controllers/managerController'); // NUEVO
+const managerController = require('./controllers/managerController');
+const adminController = require('./controllers/adminController');
 
 // --- CONFIGURACIÓN ---
 dotenv.config();
@@ -59,10 +60,25 @@ app.delete('/api/cita/:id_cita', appointmentController.cancelAppointment);
 app.get('/api/cashier/data', cashierController.getDashboardData);
 app.post('/api/cashier/checkout', cashierController.processSale);
 
-// --- 5. API (GERENTE) --- NUEVO
+// --- 5. API (GERENTE) ---
 app.get('/api/manager/data', managerController.getDashboardData);
 app.post('/api/manager/empleado', managerController.registrarEmpleado);
 app.delete('/api/manager/empleado/:id_empleado', managerController.despedirEmpleado);
+
+// --- 6. API (ADMINISTRADOR) ---
+app.get('/api/admin/data', adminController.getDashboardData);
+app.get('/api/admin/empleados', adminController.getEmpleadosSucursal);
+app.get('/api/admin/inventario', adminController.getInventarioSucursal);
+app.post('/api/admin/gerente', adminController.crearGerente);
+app.delete('/api/admin/gerente/:id_gerente', adminController.despedirGerente);
+
+// --- 7. API (PROMOCIONES - ADMIN) ---
+app.get('/api/admin/promociones', adminController.getPromociones);
+app.get('/api/admin/promociones/items', adminController.getItemsParaPromocion);
+app.get('/api/admin/promociones/:id_promocion', adminController.getPromocionDetalle);
+app.post('/api/admin/promociones', adminController.crearPromocion);
+app.put('/api/admin/promociones/:id_promocion/toggle', adminController.togglePromocion);
+app.delete('/api/admin/promociones/:id_promocion', adminController.eliminarPromocion);
 
 // ================= ARRANQUE =================
 

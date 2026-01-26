@@ -2,7 +2,7 @@ const CashierModel = require('../models/cashierModel');
 
 const controller = {};
 
-// Obtener datos del Dashboard (Nombre Cajero, Sucursal, Citas, Productos)
+// Obtener datos del Dashboard
 controller.getDashboardData = async (req, res) => {
     const { id_cajero } = req.query;
 
@@ -11,7 +11,7 @@ controller.getDashboardData = async (req, res) => {
     }
 
     try {
-        // 1. Averiguar quién es el cajero y dónde trabaja
+        // 1. Info del cajero
         const infoCajero = await CashierModel.getCajeroInfo(id_cajero);
 
         if (!infoCajero) {
@@ -20,15 +20,20 @@ controller.getDashboardData = async (req, res) => {
 
         const idSucursal = infoCajero.id_sucursal;
 
-        // 2. Cargar datos de ESA sucursal
+        // 2. Citas pendientes con promociones
         const citas = await CashierModel.getCitasPendientes(idSucursal);
+
+        // 3. Productos con promociones
         const productos = await CashierModel.getProductos(idSucursal);
 
-        // 3. Responder con todo el paquete
+        // 4. Servicios con promociones (para venta directa)
+        const servicios = await CashierModel.getServicios();
+
         res.json({
-            cajero: infoCajero, // { nombre_cajero, id_sucursal, nombre_sucursal }
+            cajero: infoCajero,
             citas,
-            productos
+            productos,
+            servicios
         });
 
     } catch (error) {
@@ -37,6 +42,7 @@ controller.getDashboardData = async (req, res) => {
     }
 };
 
+// Procesar venta
 controller.processSale = async (req, res) => {
     try {
         const result = await CashierModel.procesarVentaCompleta(req.body);

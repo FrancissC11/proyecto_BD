@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* --- ESTILOS VISUALES INTEGRADOS --- */
         :root {
             --primary: #d4a5a5;
             --dark: #b58383;
@@ -17,6 +16,7 @@
             --text: #333;
             --green: #2ecc71;
             --red: #e74c3c;
+            --orange: #f39c12;
             --border-color: #eee;
         }
 
@@ -31,7 +31,6 @@
             color: var(--text);
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: 250px;
             background: var(--white);
@@ -72,13 +71,8 @@
             font-weight: 600;
         }
 
-        .menu-btn i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
+        .menu-btn i { margin-right: 10px; width: 20px; text-align: center; }
 
-        /* MAIN CONTENT */
         .main-content {
             flex: 1;
             padding: 2rem;
@@ -88,13 +82,7 @@
             gap: 2rem;
         }
 
-        .section-view {
-            display: none;
-            width: 100%;
-            height: 100%;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
+        .section-view { display: none; width: 100%; height: 100%; animation: fadeIn 0.3s ease-in-out; }
         .section-view.active { display: block; }
 
         @keyframes fadeIn {
@@ -102,13 +90,8 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h2 {
-            font-family: 'Playfair Display', serif;
-            margin-bottom: 1.5rem;
-            color: var(--text);
-        }
+        h2 { font-family: 'Playfair Display', serif; margin-bottom: 1.5rem; color: var(--text); }
 
-        /* TABLA CITAS */
         .table-container {
             background: var(--white);
             border-radius: 12px;
@@ -117,11 +100,7 @@
             overflow-x: auto;
         }
 
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
+        .custom-table { width: 100%; border-collapse: collapse; }
         .custom-table th {
             text-align: left;
             padding: 1rem;
@@ -129,7 +108,6 @@
             font-weight: 600;
             border-bottom: 2px solid var(--border-color);
         }
-
         .custom-table td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
@@ -144,6 +122,7 @@
             text-transform: uppercase;
         }
         .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-promo { background: #d4edda; color: #155724; }
 
         .btn-action {
             padding: 0.5rem 0.8rem;
@@ -158,17 +137,29 @@
         .btn-pay { background: var(--green); }
         .btn-pay:hover { background: #27ae60; }
 
-        /* POS LAYOUT */
-        .pos-layout {
-            display: flex;
-            gap: 2rem;
-            height: 100%;
-        }
+        .pos-layout { display: flex; gap: 2rem; height: 100%; }
 
-        .product-grid-container {
-            flex: 2;
+        .product-grid-container { flex: 2; display: flex; flex-direction: column; }
+
+        .category-tabs {
             display: flex;
-            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .category-tab {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .category-tab:hover, .category-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         .product-grid {
@@ -183,28 +174,37 @@
         .product-card {
             background: white;
             border-radius: 10px;
-            padding: 1.5rem 1rem;
+            padding: 1rem;
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             cursor: pointer;
             transition: 0.2s;
-            border: 1px solid transparent;
+            border: 2px solid transparent;
+            position: relative;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             border-color: var(--primary);
-            box-shadow: 0 5px 15px rgba(212, 165, 165, 0.2);
         }
 
-        .product-price {
-            color: var(--dark);
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
+        .product-card.has-promo { border-color: var(--green); }
+
+        .promo-tag {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--green);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
 
-        /* CARRITO */
+        .product-price { color: var(--dark); font-weight: 700; font-size: 1rem; margin-top: 0.5rem; }
+        .product-price-old { text-decoration: line-through; color: #999; font-size: 0.8rem; }
+
         .cart-panel {
             flex: 1;
             background: white;
@@ -212,7 +212,7 @@
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 4rem);
+            max-height: calc(100vh - 4rem);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border-left: 5px solid var(--dark);
         }
@@ -234,15 +234,17 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .cart-total {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: right;
-            margin-top: 1rem;
-            color: var(--dark);
+        .cart-item-promo { color: var(--green); font-size: 0.75rem; }
+
+        .cart-summary {
             border-top: 2px solid var(--border-color);
             padding-top: 1rem;
+            margin-top: 1rem;
         }
+
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .summary-row.discount { color: var(--green); }
+        .summary-row.total { font-size: 1.3rem; font-weight: 700; color: var(--dark); margin-top: 0.5rem; }
 
         .btn-checkout {
             width: 100%;
@@ -266,10 +268,11 @@
             padding: 0.5rem;
             border-radius: 6px;
             cursor: pointer;
+            width: 100%;
+            margin-top: 0.5rem;
         }
         .btn-cancel:hover { background: var(--red); color: white; }
 
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -281,7 +284,6 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(2px);
         }
 
         .modal-content {
@@ -290,13 +292,8 @@
             border-radius: 15px;
             width: 600px;
             max-width: 90%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: slideUp 0.3s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .invoice-header {
@@ -328,12 +325,14 @@
             border: 1px solid var(--border-color);
         }
 
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .invoice-items { max-height: 150px; overflow-y: auto; margin-bottom: 1rem; }
+        .invoice-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+
         .total-row {
             font-weight: 700;
             font-size: 1.2rem;
             color: var(--dark);
-            border-top: 1px solid #ddd;
+            border-top: 2px solid #ddd;
             padding-top: 0.5rem;
             margin-top: 0.5rem;
         }
@@ -348,10 +347,10 @@
         </div>
         <nav>
             <button class="menu-btn active" onclick="switchView('citas')">
-                <i class="fas fa-calendar-check"></i> Gestión de Citas
+                <i class="fas fa-calendar-check"></i> Citas Pendientes
             </button>
             <button class="menu-btn" onclick="switchView('pos')">
-                <i class="fas fa-shopping-basket"></i> Venta Productos
+                <i class="fas fa-shopping-basket"></i> Venta Directa
             </button>
             
             <div style="margin-top: auto; border-top: 1px solid #eee; padding-top: 1rem;">
@@ -367,11 +366,12 @@
 
     <main class="main-content">
         
+        <!-- VISTA: CITAS PENDIENTES -->
         <div id="view-citas" class="section-view active">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2>Citas Pendientes</h2>
+                <h2>Citas Pendientes de Hoy</h2>
                 <button class="btn-action" style="background: #666;" onclick="loadDashboardData()">
-                    <i class="fas fa-sync-alt"></i> Recargar
+                    <i class="fas fa-sync-alt"></i> Actualizar
                 </button>
             </div>
             
@@ -381,77 +381,118 @@
                         <tr>
                             <th>Hora</th>
                             <th>Cliente</th>
-                            <th>Servicio / Empleado</th>
-                            <th>Total Est.</th>
-                            <th>Estado</th>
+                            <th>Servicio</th>
+                            <th>Precio</th>
+                            <th>Promoción</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="citas-body">
-                        <tr><td colspan="6" style="text-align:center; padding: 2rem;">Iniciando sistema...</td></tr>
+                        <tr><td colspan="6" style="text-align:center; padding: 2rem;">Cargando...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
+        <!-- VISTA: PUNTO DE VENTA -->
         <div id="view-pos" class="section-view">
             <div class="pos-layout">
-                <div class="product-grid-container" style="flex: 2; display: flex; flex-direction: column;">
-                    <h2 style="margin-bottom: 1rem;">Catálogo de Productos</h2>
+                <div class="product-grid-container">
+                    <h2 style="margin-bottom: 0.5rem;">Catálogo</h2>
+                    
+                    <!-- Tabs de categorías -->
+                    <div class="category-tabs" id="category-tabs">
+                        <button class="category-tab active" onclick="filtrarCategoria('todos', this)">Todos</button>
+                        <button class="category-tab" onclick="filtrarCategoria('productos', this)">Productos</button>
+                        <button class="category-tab" onclick="filtrarCategoria('servicios', this)">Servicios</button>
+                    </div>
+
                     <div class="product-grid" id="product-grid">
-                        </div>
+                        <p style="color: #888;">Cargando catálogo...</p>
+                    </div>
                 </div>
 
                 <div class="cart-panel">
                     <div class="cart-header">
-                        <h3><i class="fas fa-shopping-cart"></i> Venta en Curso</h3>
+                        <h3><i class="fas fa-shopping-cart"></i> Carrito</h3>
                     </div>
                     <div class="cart-items" id="cart-items">
-                        <p style="text-align: center; color: #999; margin-top: 2rem;">Carrito vacío</p>
+                        <div style="text-align: center; color: #bbb; margin-top: 2rem;">
+                            <i class="fas fa-shopping-cart" style="font-size: 2rem;"></i>
+                            <p>Carrito vacío</p>
+                        </div>
                     </div>
-                    <div class="cart-total">
-                        Total: $<span id="cart-total">0.00</span>
+                    
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span>$<span id="cart-subtotal">0.00</span></span>
+                        </div>
+                        <div class="summary-row discount" id="row-descuento" style="display: none;">
+                            <span>Descuentos:</span>
+                            <span>-$<span id="cart-descuento">0.00</span></span>
+                        </div>
+                        <div class="summary-row">
+                            <span>IVA (12%):</span>
+                            <span>$<span id="cart-iva">0.00</span></span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>TOTAL:</span>
+                            <span>$<span id="cart-total">0.00</span></span>
+                        </div>
                     </div>
+
                     <button class="btn-checkout" onclick="abrirFactura()">
-                        <i class="fas fa-money-bill-wave"></i> Pagar
+                        <i class="fas fa-money-bill-wave"></i> Procesar Pago
                     </button>
-                    <button class="btn-cancel" onclick="limpiarCarrito()" style="width: 100%; margin-top: 0.5rem; text-align: center;">
-                        Cancelar
+                    <button class="btn-cancel" onclick="limpiarCarrito()">
+                        <i class="fas fa-times"></i> Cancelar Venta
                     </button>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- MODAL: FACTURACIÓN -->
     <div id="modalFactura" class="modal">
         <div class="modal-content">
             <div class="invoice-header">
-                <h3>Facturación</h3>
+                <h3><i class="fas fa-file-invoice-dollar"></i> Facturación</h3>
                 <button onclick="cerrarFactura()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
             </div>
             <form id="facturaForm" onsubmit="procesarPago(event)">
-                <h4 style="margin-bottom: 0.8rem; color: #666; font-size: 0.9rem;">DATOS CLIENTE</h4>
+                <h4 style="margin-bottom: 0.8rem; color: #666; font-size: 0.9rem;">DATOS DEL CLIENTE</h4>
                 <div class="form-row">
-                    <input type="text" id="facturaCedula" class="input-std" placeholder="Cédula" required maxlength="13" style="flex:1;">
+                    <input type="text" id="facturaCedula" class="input-std" placeholder="Cédula" required maxlength="10" style="flex:1;">
                     <input type="text" id="facturaTelefono" class="input-std" placeholder="Teléfono" maxlength="10" style="flex:1;">
                 </div>
                 <div class="form-row">
                     <input type="text" id="facturaNombre" class="input-std" placeholder="Nombre Completo" required style="flex:2;">
-                    <input type="email" id="facturaCorreo" class="input-std" placeholder="Correo" style="flex:2;">
+                    <input type="email" id="facturaCorreo" class="input-std" placeholder="Correo (opcional)" style="flex:2;">
                 </div>
+
+                <h4 style="margin: 1rem 0 0.5rem; color: #666; font-size: 0.9rem;">DETALLE DE LA VENTA</h4>
+                <div class="invoice-items" id="invoice-items"></div>
+
                 <div class="invoice-summary">
                     <div class="summary-row"><span>Subtotal:</span><span id="facturaSubtotal">$0.00</span></div>
+                    <div class="summary-row discount" id="factura-row-desc" style="display: none;">
+                        <span>Descuentos aplicados:</span><span id="facturaDescuento">-$0.00</span>
+                    </div>
                     <div class="summary-row"><span>IVA (12%):</span><span id="facturaIVA">$0.00</span></div>
-                    <div class="total-row summary-row"><span>TOTAL:</span><span id="facturaTotal" style="color: var(--green);">$0.00</span></div>
+                    <div class="total-row summary-row"><span>TOTAL A PAGAR:</span><span id="facturaTotal" style="color: var(--green);">$0.00</span></div>
                 </div>
+
                 <div style="margin-bottom: 1.5rem;">
-                    <label>Método de Pago</label>
-                    <select id="facturaMetodo" class="input-std" style="width: 100%;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Método de Pago</label>
+                    <select id="facturaMetodo" class="input-std">
                         <option value="Efectivo">Efectivo</option>
                         <option value="Transferencia">Transferencia</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-checkout" style="background: var(--green);">Confirmar Pago</button>
+                <button type="submit" class="btn-checkout" style="background: var(--green);">
+                    <i class="fas fa-check-circle"></i> Confirmar Pago
+                </button>
             </form>
         </div>
     </div>
@@ -460,74 +501,96 @@
         // --- ESTADO GLOBAL ---
         let citas = [];
         let productos = [];
+        let servicios = [];
         let carrito = [];
-        let currentCajero = null; // Se llenará dinámicamente
+        let currentCajero = null;
+        let filtroActual = 'todos';
 
-        // Obtener ID de la URL
         const params = new URLSearchParams(window.location.search);
         const cajeroId = params.get('id');
 
         document.addEventListener('DOMContentLoaded', () => {
-            if(!cajeroId) {
-                alert("Error de sesión: No se identificó al cajero. Redirigiendo al login...");
+            if (!cajeroId) {
+                alert("Error de sesión: No se identificó al cajero.");
                 window.location.href = '/';
                 return;
             }
             loadDashboardData();
         });
 
-        // 1. CARGA DE DATOS DEL DASHBOARD
+        // --- CARGAR DATOS ---
         async function loadDashboardData() {
             try {
-                // Fetch enviando el ID del cajero para obtener su sucursal real
                 const res = await fetch(`/api/cashier/data?id_cajero=${cajeroId}`);
                 const data = await res.json();
                 
-                if(data.error) {
-                    throw new Error(data.error);
-                }
+                if (data.error) throw new Error(data.error);
 
-                // 1. Actualizar Datos del Cajero y Sucursal en el HTML
                 currentCajero = data.cajero;
+                citas = data.citas;
+                productos = data.productos;
+                servicios = data.servicios;
+                
                 document.getElementById('cajero-nombre').innerText = currentCajero.nombre_cajero;
                 document.getElementById('sucursal-display').innerText = `Caja - ${currentCajero.nombre_sucursal}`;
 
-                // 2. Guardar y Renderizar Datos
-                citas = data.citas;
-                productos = data.productos;
-                
                 renderCitas();
-                renderProductos();
+                renderCatalogo();
 
             } catch (error) {
-                console.error("Error cargando dashboard:", error);
+                console.error("Error:", error);
                 document.getElementById('citas-body').innerHTML = `
                     <tr><td colspan="6" style="text-align:center; color: var(--red); padding: 2rem;">
-                        <i class="fas fa-exclamation-triangle"></i> Error: ${error.message}
+                        <i class="fas fa-exclamation-triangle"></i> ${error.message}
                     </td></tr>`;
             }
         }
 
-        // --- RENDERS ---
+        // --- RENDER: CITAS ---
         function renderCitas() {
             const tbody = document.getElementById('citas-body');
             tbody.innerHTML = '';
             
-            if(citas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2rem; color: #888;">No hay citas pendientes para hoy en esta sucursal.</td></tr>';
+            if (citas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2rem; color: #888;">No hay citas pendientes</td></tr>';
                 return;
             }
 
             citas.forEach(cita => {
+                // Calcular precio con descuento
+                let precioFinal = cita.precio_base;
+                let descuentoAplicado = 0;
+                let tienePromo = cita.id_promocion != null;
+
+                if (tienePromo) {
+                    if (cita.tipo_descuento === 'Porcentaje') {
+                        descuentoAplicado = cita.precio_base * (cita.valor_descuento / 100);
+                    } else {
+                        descuentoAplicado = cita.valor_descuento;
+                    }
+                    precioFinal = cita.precio_base - descuentoAplicado;
+                }
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${cita.hora}</strong></td>
-                    <td>${cita.cliente}<br><small style="color:#888">${cita.cedula}</small></td>
-                    <td>${cita.servicio_nombre}<br><small style="color:#666">${cita.empleado}</small></td>
-                    <td style="font-weight:600;">$${cita.precio.toFixed(2)}</td>
-                    <td><span class="status-badge badge-pending">Pendiente</span></td>
                     <td>
-                        <button class="btn-action btn-pay" onclick="agregarCitaAlCarrito(${cita.id_cita})">
+                        ${cita.cliente}<br>
+                        <small style="color:#888">${cita.cedula}</small>
+                    </td>
+                    <td>
+                        ${cita.servicio_nombre}<br>
+                        <small style="color:#666">${cita.empleado}</small>
+                    </td>
+                    <td>
+                        ${tienePromo ? `<span class="product-price-old">$${cita.precio_base.toFixed(2)}</span><br>` : ''}
+                        <strong style="color: ${tienePromo ? 'var(--green)' : 'inherit'}">$${precioFinal.toFixed(2)}</strong>
+                    </td>
+                    <td>
+                        ${tienePromo ? `<span class="status-badge badge-promo">${cita.promocion_nombre}</span>` : '<span style="color:#999">-</span>'}
+                    </td>
+                    <td>
+                        <button class="btn-action btn-pay" onclick='agregarCitaAlCarrito(${JSON.stringify(cita)})'>
                             <i class="fas fa-cart-plus"></i> Cobrar
                         </button>
                     </td>
@@ -536,122 +599,304 @@
             });
         }
 
-        function renderProductos() {
+        // --- RENDER: CATÁLOGO ---
+        function renderCatalogo() {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
-            
-            if(productos.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:#888;">No hay productos con stock en esta sucursal.</p>';
+
+            let items = [];
+
+            if (filtroActual === 'todos' || filtroActual === 'productos') {
+                productos.forEach(p => {
+                    items.push({ ...p, tipo: 'PRODUCTO' });
+                });
+            }
+
+            if (filtroActual === 'todos' || filtroActual === 'servicios') {
+                servicios.forEach(s => {
+                    items.push({ ...s, tipo: 'SERVICIO', precio_base: s.precio_base });
+                });
+            }
+
+            if (items.length === 0) {
+                grid.innerHTML = '<p style="color: #888; grid-column: 1/-1; text-align: center;">No hay items disponibles</p>';
                 return;
             }
 
-            productos.forEach(prod => {
+            items.forEach(item => {
+                const tienePromo = item.id_promocion != null;
+                let precioFinal = item.precio_base;
+                let descuento = 0;
+
+                if (tienePromo) {
+                    if (item.tipo_descuento === 'Porcentaje') {
+                        descuento = item.precio_base * (item.valor_descuento / 100);
+                    } else {
+                        descuento = item.valor_descuento;
+                    }
+                    precioFinal = item.precio_base - descuento;
+                }
+
                 const card = document.createElement('div');
-                card.className = 'product-card';
-                card.onclick = () => agregarProductoAlCarrito(prod.id_producto);
+                card.className = `product-card ${tienePromo ? 'has-promo' : ''}`;
+                card.onclick = () => agregarAlCarrito(item);
+                
                 card.innerHTML = `
-                    <div style="font-size: 2.5rem; color: #d4a5a5; margin-bottom: 0.5rem;"><i class="fas fa-box"></i></div>
-                    <h4 style="font-size: 0.95rem;">${prod.nombre}</h4>
-                    <div class="product-price">$${prod.precio.toFixed(2)}</div>
-                    <div style="font-size: 0.8rem; color: #999;">Stock: ${prod.stock}</div>
+                    ${tienePromo ? `<span class="promo-tag">-${item.tipo_descuento === 'Porcentaje' ? item.valor_descuento + '%' : '$' + item.valor_descuento}</span>` : ''}
+                    <div style="font-size: 2rem; color: ${item.tipo === 'PRODUCTO' ? '#d4a5a5' : '#a5d4c4'}; margin-bottom: 0.5rem;">
+                        <i class="fas fa-${item.tipo === 'PRODUCTO' ? 'box' : 'spa'}"></i>
+                    </div>
+                    <h4 style="font-size: 0.85rem; margin-bottom: 0.3rem;">${item.nombre}</h4>
+                    <div style="font-size: 0.75rem; color: #888;">${item.categoria || ''}</div>
+                    ${tienePromo ? `<div class="product-price-old">$${item.precio_base.toFixed(2)}</div>` : ''}
+                    <div class="product-price" style="color: ${tienePromo ? 'var(--green)' : 'var(--dark)'}">$${precioFinal.toFixed(2)}</div>
+                    ${item.tipo === 'PRODUCTO' ? `<div style="font-size: 0.75rem; color: #999;">Stock: ${item.stock}</div>` : ''}
                 `;
                 grid.appendChild(card);
             });
         }
 
-        function renderCarrito() {
-            const container = document.getElementById('cart-items');
-            const totalSpan = document.getElementById('cart-total');
-            container.innerHTML = '';
-            let total = 0;
+        function filtrarCategoria(categoria, btn) {
+            filtroActual = categoria;
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            renderCatalogo();
+        }
 
-            if (carrito.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #bbb; margin-top: 3rem;"><i class="fas fa-shopping-cart" style="font-size: 3rem;"></i><p>Carrito vacío</p></div>';
-                totalSpan.innerText = '0.00';
+        // --- CARRITO ---
+        function calcularPrecioItem(item) {
+            let precioOriginal = item.precio_base;
+            let descuento = 0;
+
+            if (item.id_promocion) {
+                if (item.tipo_descuento === 'Porcentaje') {
+                    descuento = precioOriginal * (item.valor_descuento / 100);
+                } else {
+                    descuento = item.valor_descuento;
+                }
+            }
+
+            return {
+                precio_original: precioOriginal,
+                descuento_unitario: descuento,
+                precio_final: precioOriginal - descuento
+            };
+        }
+
+        function agregarCitaAlCarrito(cita) {
+            if (carrito.find(i => i.type === 'SERVICIO' && i.id_cita === cita.id_cita)) {
+                alert("Esta cita ya está en el carrito");
                 return;
             }
 
+            const precios = calcularPrecioItem({
+                precio_base: cita.precio_base,
+                id_promocion: cita.id_promocion,
+                tipo_descuento: cita.tipo_descuento,
+                valor_descuento: cita.valor_descuento
+            });
+
+            carrito.push({
+                type: 'SERVICIO',
+                id_cita: cita.id_cita,
+                id_servicio: cita.id_servicio,
+                nombre: `${cita.servicio_nombre} (${cita.empleado})`,
+                cantidad: 1,
+                precio_original: precios.precio_original,
+                descuento_aplicado: precios.descuento_unitario,
+                subtotal: precios.precio_final,
+                promocion_nombre: cita.promocion_nombre,
+                cliente_nombre: cita.cliente,
+                cliente_cedula: cita.cedula,
+                id_cliente: cita.id_cliente
+            });
+
+            switchView('pos');
+            renderCarrito();
+        }
+
+        function agregarAlCarrito(item) {
+            const precios = calcularPrecioItem(item);
+
+            if (item.tipo === 'PRODUCTO') {
+                const existing = carrito.find(i => i.type === 'PRODUCTO' && i.id === item.id_producto);
+                if (existing) {
+                    if (existing.cantidad < item.stock) {
+                        existing.cantidad++;
+                        existing.descuento_aplicado = precios.descuento_unitario * existing.cantidad;
+                        existing.subtotal = precios.precio_final * existing.cantidad;
+                    } else {
+                        alert("Stock insuficiente");
+                        return;
+                    }
+                } else {
+                    carrito.push({
+                        type: 'PRODUCTO',
+                        id: item.id_producto,
+                        nombre: item.nombre,
+                        cantidad: 1,
+                        precio_original: precios.precio_original,
+                        descuento_aplicado: precios.descuento_unitario,
+                        subtotal: precios.precio_final,
+                        promocion_nombre: item.promocion_nombre,
+                        stock: item.stock
+                    });
+                }
+            } else {
+                carrito.push({
+                    type: 'SERVICIO',
+                    id_servicio: item.id_servicio,
+                    nombre: item.nombre,
+                    cantidad: 1,
+                    precio_original: precios.precio_original,
+                    descuento_aplicado: precios.descuento_unitario,
+                    subtotal: precios.precio_final,
+                    promocion_nombre: item.promocion_nombre
+                });
+            }
+
+            renderCarrito();
+        }
+
+        function eliminarDelCarrito(idx) {
+            carrito.splice(idx, 1);
+            renderCarrito();
+        }
+
+        function renderCarrito() {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+
+            if (carrito.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #bbb; margin-top: 2rem;">
+                        <i class="fas fa-shopping-cart" style="font-size: 2rem;"></i>
+                        <p>Carrito vacío</p>
+                    </div>`;
+                actualizarTotales(0, 0);
+                return;
+            }
+
+            let subtotalSinDesc = 0;
+            let totalDescuentos = 0;
+
             carrito.forEach((item, index) => {
-                const sub = item.precio * item.cantidad;
-                total += sub;
+                subtotalSinDesc += item.precio_original * item.cantidad;
+                totalDescuentos += item.descuento_aplicado;
+
                 container.innerHTML += `
                     <div class="cart-item">
                         <div style="flex: 1;">
                             <div style="font-weight: 500;">${item.nombre}</div>
-                            <div style="font-size: 0.85rem; color: #666;">${item.type === 'SERVICIO' ? 'Servicio' : 'x'+item.cantidad}</div>
+                            <div style="font-size: 0.8rem; color: #666;">
+                                ${item.type === 'SERVICIO' ? 'Servicio' : 'x' + item.cantidad}
+                                ${item.promocion_nombre ? `<span class="cart-item-promo"><i class="fas fa-tag"></i> ${item.promocion_nombre}</span>` : ''}
+                            </div>
                         </div>
                         <div style="display:flex; align-items:center; gap:10px;">
-                            <strong>$${sub.toFixed(2)}</strong>
+                            <div style="text-align: right;">
+                                ${item.descuento_aplicado > 0 ? `<div style="text-decoration: line-through; color: #999; font-size: 0.8rem;">$${(item.precio_original * item.cantidad).toFixed(2)}</div>` : ''}
+                                <strong style="color: ${item.descuento_aplicado > 0 ? 'var(--green)' : 'inherit'}">$${item.subtotal.toFixed(2)}</strong>
+                            </div>
                             <i class="fas fa-trash-alt" style="color:#e74c3c; cursor:pointer;" onclick="eliminarDelCarrito(${index})"></i>
                         </div>
                     </div>`;
             });
-            totalSpan.innerText = total.toFixed(2);
+
+            actualizarTotales(subtotalSinDesc, totalDescuentos);
         }
 
-        // --- ACCIONES ---
-        function agregarCitaAlCarrito(idCita) {
-            if(carrito.find(i => i.type === 'SERVICIO' && i.id === idCita)) return alert("Ya está en el carrito.");
-            const cita = citas.find(c => c.id_cita === idCita);
-            carrito.push({
-                type: 'SERVICIO', id: idCita, id_servicio_real: 1, 
-                nombre: `${cita.servicio_nombre} (${cita.empleado})`, precio: cita.precio, cantidad: 1,
-                cliente_nombre: cita.cliente, cliente_cedula: cita.cedula
-            });
-            switchView('pos'); renderCarrito();
+        function actualizarTotales(subtotalSinDesc, totalDescuentos) {
+            const subtotalConDesc = subtotalSinDesc - totalDescuentos;
+            const iva = subtotalConDesc * 0.12;
+            const total = subtotalConDesc + iva;
+
+            document.getElementById('cart-subtotal').innerText = subtotalSinDesc.toFixed(2);
+            document.getElementById('cart-descuento').innerText = totalDescuentos.toFixed(2);
+            document.getElementById('cart-iva').innerText = iva.toFixed(2);
+            document.getElementById('cart-total').innerText = total.toFixed(2);
+
+            document.getElementById('row-descuento').style.display = totalDescuentos > 0 ? 'flex' : 'none';
+
+            window.totalesVenta = {
+                subtotal_sin_descuento: subtotalSinDesc,
+                descuentos: totalDescuentos,
+                subtotal: subtotalConDesc,
+                iva: iva,
+                total: total
+            };
         }
 
-        function agregarProductoAlCarrito(idProd) {
-            const prod = productos.find(p => p.id_producto === idProd);
-            const existing = carrito.find(i => i.type === 'PRODUCTO' && i.id === idProd);
-            if(existing) {
-                if(existing.cantidad < prod.stock) existing.cantidad++;
-                else return alert("Stock insuficiente");
-            } else {
-                carrito.push({ type: 'PRODUCTO', id: idProd, nombre: prod.nombre, precio: prod.precio, cantidad: 1 });
+        function limpiarCarrito() {
+            if (carrito.length === 0) return;
+            if (confirm("¿Cancelar la venta actual?")) {
+                carrito = [];
+                renderCarrito();
             }
-            renderCarrito();
         }
 
-        function eliminarDelCarrito(idx) { carrito.splice(idx, 1); renderCarrito(); }
-        function limpiarCarrito() { if(confirm("¿Cancelar venta?")) { carrito = []; renderCarrito(); } }
-
-        // --- PAGO ---
+        // --- FACTURACIÓN ---
         function abrirFactura() {
-            if(carrito.length === 0) return alert("Carrito vacío");
-            const sub = carrito.reduce((sum, i) => sum + (i.precio * i.cantidad), 0);
-            const iva = sub * 0.12;
-            const tot = sub + iva;
-            
-            document.getElementById('facturaSubtotal').innerText = '$'+sub.toFixed(2);
-            document.getElementById('facturaIVA').innerText = '$'+iva.toFixed(2);
-            document.getElementById('facturaTotal').innerText = '$'+tot.toFixed(2);
-            window.totales = { sub, iva, tot };
+            if (carrito.length === 0) {
+                alert("El carrito está vacío");
+                return;
+            }
 
-            const itemCita = carrito.find(i => i.type === 'SERVICIO');
-            if(itemCita) {
+            // Llenar datos del cliente si viene de una cita
+            const itemCita = carrito.find(i => i.type === 'SERVICIO' && i.cliente_cedula);
+            if (itemCita) {
                 document.getElementById('facturaCedula').value = itemCita.cliente_cedula;
                 document.getElementById('facturaNombre').value = itemCita.cliente_nombre;
             } else {
                 document.getElementById('facturaForm').reset();
             }
+
+            // Mostrar items en factura
+            const itemsContainer = document.getElementById('invoice-items');
+            itemsContainer.innerHTML = '';
+            carrito.forEach(item => {
+                itemsContainer.innerHTML += `
+                    <div class="invoice-item">
+                        <span>${item.nombre} ${item.type === 'PRODUCTO' ? 'x' + item.cantidad : ''}</span>
+                        <span>
+                            ${item.descuento_aplicado > 0 ? `<span style="text-decoration: line-through; color: #999; margin-right: 5px;">$${(item.precio_original * item.cantidad).toFixed(2)}</span>` : ''}
+                            $${item.subtotal.toFixed(2)}
+                        </span>
+                    </div>
+                `;
+            });
+
+            // Mostrar totales
+            document.getElementById('facturaSubtotal').innerText = '$' + window.totalesVenta.subtotal_sin_descuento.toFixed(2);
+            document.getElementById('facturaDescuento').innerText = '-$' + window.totalesVenta.descuentos.toFixed(2);
+            document.getElementById('facturaIVA').innerText = '$' + window.totalesVenta.iva.toFixed(2);
+            document.getElementById('facturaTotal').innerText = '$' + window.totalesVenta.total.toFixed(2);
+
+            document.getElementById('factura-row-desc').style.display = window.totalesVenta.descuentos > 0 ? 'flex' : 'none';
+
             document.getElementById('modalFactura').style.display = 'flex';
         }
 
         async function procesarPago(e) {
             e.preventDefault();
+            
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true; btn.innerText = "Procesando...";
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
+            const itemCita = carrito.find(i => i.type === 'SERVICIO' && i.id_cliente);
 
             const data = {
-                id_cajero: currentCajero.id_empleado || cajeroId,
-                id_sucursal: currentCajero.id_sucursal || 1,
+                id_cajero: currentCajero.id_empleado,
+                id_sucursal: currentCajero.id_sucursal,
                 nombre_cliente: document.getElementById('facturaNombre').value,
                 cedula_cliente: document.getElementById('facturaCedula').value,
-                telefono: document.getElementById('facturaTelefono').value,
-                correo: document.getElementById('facturaCorreo').value,
-                id_cliente: null,
-                subtotal: window.totales.sub, iva: window.totales.iva, total: window.totales.tot,
+                telefono: document.getElementById('facturaTelefono').value || null,
+                correo: document.getElementById('facturaCorreo').value || null,
+                id_cliente: itemCita?.id_cliente || null,
+                subtotal: window.totalesVenta.subtotal,
+                iva: window.totalesVenta.iva,
+                total: window.totalesVenta.total,
                 metodo_pago: document.getElementById('facturaMetodo').value,
                 items: carrito
             };
@@ -659,26 +904,38 @@
             try {
                 const res = await fetch('/api/cashier/checkout', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
                 const result = await res.json();
-                if(result.success) {
-                    alert(`✅ Venta Exitosa. Factura: ${result.id_factura}`);
-                    carrito = []; renderCarrito(); cerrarFactura(); loadDashboardData(); switchView('citas');
+
+                if (result.success) {
+                    alert(`✅ Venta Exitosa!\n\nFactura: ${result.num_factura}\nTotal: $${result.total.toFixed(2)}`);
+                    carrito = [];
+                    renderCarrito();
+                    cerrarFactura();
+                    loadDashboardData();
+                    switchView('citas');
                 } else {
                     alert("Error: " + result.error);
                 }
-            } catch(err) { alert("Error de red"); console.error(err); }
-            finally { btn.disabled = false; btn.innerText = "Confirmar Pago"; }
+            } catch (err) {
+                console.error(err);
+                alert("Error de conexión");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirmar Pago';
+            }
         }
 
-        function cerrarFactura() { document.getElementById('modalFactura').style.display = 'none'; }
+        function cerrarFactura() {
+            document.getElementById('modalFactura').style.display = 'none';
+        }
         
         function switchView(view) {
             document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.menu-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-'+view).classList.add('active');
+            document.getElementById('view-' + view).classList.add('active');
             const idx = view === 'citas' ? 0 : 1;
             document.querySelectorAll('.menu-btn')[idx].classList.add('active');
         }
