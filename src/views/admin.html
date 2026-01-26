@@ -6,12 +6,100 @@
     <title>Panel Administrativo | Belleza & Estilo</title>
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .promo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid #d4a5a5;
+        }
+        .promo-card.inactive {
+            border-left-color: #ccc;
+            opacity: 0.7;
+        }
+        .promo-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-inactive { background: #f8d7da; color: #721c24; }
+        .badge-porcentaje { background: #cce5ff; color: #004085; }
+        .badge-monto { background: #fff3cd; color: #856404; }
+        .items-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .item-tag {
+            background: #f0f0f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .checkbox-item input { cursor: pointer; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 700px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .input-std {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .input-std:focus {
+            outline: none;
+            border-color: #d4a5a5;
+        }
+    </style>
 </head>
 <body>
 
     <aside class="sidebar">
         <div class="brand">
             <h2>Belleza & Estilo</h2>
+            <p id="admin-saludo" style="font-size: 0.85rem; color: #888; text-align: center; margin-top: -1rem; margin-bottom: 1.5rem;">
+                Cargando...
+            </p>
         </div>
         
         <nav>
@@ -26,81 +114,60 @@
             <button class="menu-btn" onclick="showPanel('talento', this)">
                 <i class="fas fa-users"></i> Talento Humano
             </button>
+
+            <button class="menu-btn" onclick="showPanel('promociones', this)">
+                <i class="fas fa-tags"></i> Promociones
+            </button>
         </nav>
         
         <div style="margin-top: auto;">
-            <a href="/" style="color: #999; text-decoration: none; font-size: 0.9rem; padding-left: 1rem;">
+            <a href="/logout" style="color: #999; text-decoration: none; font-size: 0.9rem; padding-left: 1rem;">
                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
         </div>
     </aside>
 
-
     <main class="main-content">
 
+        <!-- PANEL: SUCURSALES -->
         <section id="sucursales" class="panel-section active">
             <h1 class="section-title">Nuestras Sucursales</h1>
             
-            <div class="branch-grid">
-                <div class="branch-card">
-                    <h3>Sucursal Centro</h3>
-                    <p style="color:#888; font-size: 0.9rem;">Av. Principal 123</p>
-                </div>
-                <div class="branch-card">
-                    <h3>Sucursal Norte</h3>
-                    <p style="color:#888; font-size: 0.9rem;">Plaza Mayor</p>
-                </div>
-                <div class="branch-card">
-                    <h3>Sucursal Sur</h3>
-                    <p style="color:#888; font-size: 0.9rem;">C.C. Las Flores</p>
-                </div>
+            <div class="branch-grid" id="sucursales-grid">
+                <p style="color: #888;">Cargando sucursales...</p>
             </div>
 
-            <div class="branch-details">
-                <div class="manager-info">
+            <div class="branch-details" id="branch-details" style="display: none;">
+                <div class="manager-info" id="manager-info">
                     <h4>Gerente a Cargo</h4>
-                    <div class="avatar"></div> <h3>Ana López</h3>
-                    <p style="color: var(--primary-dark); font-size: 0.9rem;">Gerente Senior</p>
+                    <div class="avatar"><i class="fas fa-user" style="font-size: 2rem; color: #ccc;"></i></div>
+                    <h3 id="gerente-nombre">Sin asignar</h3>
                 </div>
                 <div class="employee-list">
-                    <h4 style="margin-bottom: 1rem;">Equipo de Trabajo (Sucursal Centro)</h4>
-                    <ul style="list-style: none;">
-                        <li style="padding: 0.8rem 0; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center;">
-                            <i class="fas fa-cut" style="margin-right: 10px; color: #d4a5a5;"></i> Carla Méndez - Estilista
-                        </li>
-                        <li style="padding: 0.8rem 0; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center;">
-                            <i class="fas fa-hand-sparkles" style="margin-right: 10px; color: #d4a5a5;"></i> Sofia Ruiz - Manicurista
-                        </li>
-                        <li style="padding: 0.8rem 0; display: flex; align-items: center;">
-                            <i class="fas fa-user-clock" style="margin-right: 10px; color: #d4a5a5;"></i> Laura T. - Recepción
-                        </li>
+                    <h4 id="equipo-titulo" style="margin-bottom: 1rem;">Equipo de Trabajo</h4>
+                    <ul id="empleados-lista" style="list-style: none;">
+                        <li style="color: #888; padding: 1rem;">Selecciona una sucursal para ver el equipo</li>
                     </ul>
                 </div>
             </div>
         </section>
 
-
+        <!-- PANEL: INVENTARIOS -->
         <section id="inventarios" class="panel-section">
             <h1 class="section-title">Gestión de Inventarios</h1>
             
             <div class="inventory-selector-container">
-                <label for="sucursalSelect">Selecciona una sucursal para gestionar su stock:</label>
+                <label for="sucursalSelectInv">Selecciona una sucursal para gestionar su stock:</label>
                 <div class="custom-select-wrapper">
-                    <select id="sucursalSelect" onchange="mostrarInventario(this.value)">
+                    <select id="sucursalSelectInv" onchange="cargarInventario(this.value)">
                         <option value="" selected disabled>-- Elige una Sucursal --</option>
-                        <option value="centro">Sucursal Centro</option>
-                        <option value="norte">Sucursal Norte</option>
-                        <option value="sur">Sucursal Sur</option>
                     </select>
                 </div>
             </div>
 
-            <div id="inventory-table-container" style="display: none; margin-top: 3rem; animation: fadeIn 0.5s ease;">
+            <div id="inventory-table-container" style="display: none; margin-top: 3rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h3 id="inventory-title" style="color: var(--text-color);">Resultados</h3>
-                    <button class="btn-action">
-                        <i class="fas fa-plus"></i> Nuevo Producto
-                    </button>
                 </div>
 
                 <table class="inventory-table">
@@ -108,89 +175,688 @@
                         <tr>
                             <th>Producto</th>
                             <th>Categoría</th>
-                            <th>Stock</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Mínimo</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="inventario-body">
                         <tr>
-                            <td>Shampoo Keratina 500ml</td>
-                            <td>Capilar</td>
-                            <td>12 un.</td>
-                            <td style="color: green; font-weight: 600;">Disponible</td>
-                        </tr>
-                        <tr>
-                            <td>Tinte Rubio Cenizo 8.1</td>
-                            <td>Coloración</td>
-                            <td>2 un.</td>
-                            <td style="color: orange; font-weight: 600;">Bajo Stock</td>
-                        </tr>
-                        <tr>
-                            <td>Esmalte Gel Rojo Pasión</td>
-                            <td>Manicura</td>
-                            <td>0 un.</td>
-                            <td style="color: #d9534f; font-weight: 600;">Agotado</td>
-                        </tr>
-                        <tr>
-                            <td>Mascarilla Facial Hidratante</td>
-                            <td>Skin Care</td>
-                            <td>25 un.</td>
-                            <td style="color: green; font-weight: 600;">Disponible</td>
+                            <td colspan="5" style="text-align: center; color: #888;">Selecciona una sucursal</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
-
+        <!-- PANEL: TALENTO HUMANO -->
         <section id="talento" class="panel-section">
-            <h1 class="section-title">Talento Humano</h1>
-            <div style="text-align: center; padding: 4rem; color: #999; background: white; border-radius: 12px;">
-                <i class="fas fa-user-tie" style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);"></i>
-                <p>Módulo de Gestión de Gerentes en construcción.</p>
+            <h1 class="section-title">Gestión de Gerentes</h1>
+            
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+                <button class="btn-action" onclick="toggleFormGerente()">
+                    <i class="fas fa-user-plus"></i> Nuevo Gerente
+                </button>
+            </div>
+
+            <div id="form-gerente" style="display: none; background: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <h3 style="margin-bottom: 1.5rem; color: #b58383;">Registrar Nuevo Gerente</h3>
+                <form id="formNuevoGerente" onsubmit="registrarGerente(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="text" id="gerenteCedula" class="input-std" placeholder="Cédula" required maxlength="10">
+                        <input type="text" id="gerenteTelefono" class="input-std" placeholder="Teléfono (09...)" maxlength="10">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="text" id="gerenteNombres" class="input-std" placeholder="Nombres" required>
+                        <input type="text" id="gerenteApellidos" class="input-std" placeholder="Apellidos" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <select id="gerenteSucursal" class="input-std" required>
+                            <option value="">Selecciona Sucursal</option>
+                        </select>
+                        <input type="password" id="gerenteContrasena" class="input-std" placeholder="Contraseña" required>
+                    </div>
+                    <div style="text-align: right; margin-top: 1.5rem;">
+                        <button type="button" onclick="toggleFormGerente()" style="background: none; border: none; color: #888; margin-right: 1rem; cursor: pointer;">Cancelar</button>
+                        <button type="submit" class="btn-action">Guardar Gerente</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="gerentes-grid" id="gerentes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                <p style="color: #888;">Cargando gerentes...</p>
+            </div>
+        </section>
+
+        <!-- PANEL: PROMOCIONES -->
+        <section id="promociones" class="panel-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="section-title" style="margin: 0;">Gestión de Promociones</h1>
+                <button class="btn-action" onclick="abrirModalPromocion()">
+                    <i class="fas fa-plus"></i> Nueva Promoción
+                </button>
+            </div>
+
+            <div id="promociones-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+                <p style="color: #888;">Cargando promociones...</p>
             </div>
         </section>
 
     </main>
 
+    <!-- MODAL: NUEVA PROMOCIÓN -->
+    <div id="modalPromocion" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0; color: #333;">Nueva Promoción</h2>
+                <button onclick="cerrarModalPromocion()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <form id="formPromocion" onsubmit="crearPromocion(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Nombre de la Promoción</label>
+                    <input type="text" id="promoNombre" class="input-std" placeholder="Ej: Verano Radiante" required>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Descripción</label>
+                    <input type="text" id="promoDescripcion" class="input-std" placeholder="Descripción breve de la promoción">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tipo de Descuento</label>
+                        <select id="promoTipo" class="input-std" required>
+                            <option value="Porcentaje">Porcentaje (%)</option>
+                            <option value="Monto">Monto Fijo ($)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Valor del Descuento</label>
+                        <input type="number" id="promoValor" class="input-std" placeholder="Ej: 15" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Fecha Inicio</label>
+                        <input type="date" id="promoInicio" class="input-std" required>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Fecha Fin</label>
+                        <input type="date" id="promoFin" class="input-std" required>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="promoActiva" checked>
+                        <span>Activar promoción inmediatamente</span>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        <i class="fas fa-box"></i> Productos incluidos
+                    </label>
+                    <div class="checkbox-grid" id="productos-checkbox">
+                        <p style="color: #888;">Cargando productos...</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        <i class="fas fa-spa"></i> Servicios incluidos
+                    </label>
+                    <div class="checkbox-grid" id="servicios-checkbox">
+                        <p style="color: #888;">Cargando servicios...</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                    <button type="button" onclick="cerrarModalPromocion()" style="padding: 0.7rem 1.5rem; background: #eee; border: none; border-radius: 6px; cursor: pointer;">Cancelar</button>
+                    <button type="submit" class="btn-action">Crear Promoción</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: DETALLE PROMOCIÓN -->
+    <div id="modalDetalle" class="modal">
+        <div class="modal-content" style="width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 id="detalleNombre" style="margin: 0; color: #333;">Detalle</h2>
+                <button onclick="cerrarModalDetalle()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <div id="detalleContenido">
+                <p style="color: #888;">Cargando...</p>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Función 1: Cambiar entre Paneles del Sidebar
-        function showPanel(panelId, btn) {
-            // A. Ocultar todos los paneles
-            document.querySelectorAll('.panel-section').forEach(p => {
-                p.classList.remove('active');
-            });
-            
-            // B. Desactivar estilo "active" de todos los botones
-            document.querySelectorAll('.menu-btn').forEach(b => {
-                b.classList.remove('active');
-            });
+        // --- ESTADO GLOBAL ---
+        let currentAdmin = null;
+        let sucursales = [];
+        let gerentes = [];
+        let sucursalesSinGerente = [];
+        let promociones = [];
+        let productosDisponibles = [];
+        let serviciosDisponibles = [];
 
-            // C. Mostrar el panel elegido y activar su botón
-            document.getElementById(panelId).classList.add('active');
-            btn.classList.add('active');
+        const params = new URLSearchParams(window.location.search);
+        const adminId = params.get('id');
+
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!adminId) {
+                alert("Error de sesión: No se identificó al administrador. Redirigiendo...");
+                window.location.href = '/';
+                return;
+            }
+            loadDashboardData();
+        });
+
+        // --- CARGAR DATOS DEL DASHBOARD ---
+        async function loadDashboardData() {
+            try {
+                const res = await fetch(`/api/admin/data?id_admin=${adminId}`);
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                currentAdmin = data.admin;
+                sucursales = data.sucursales;
+                gerentes = data.gerentes;
+                sucursalesSinGerente = data.sucursalesSinGerente;
+
+                document.getElementById('admin-saludo').innerText = `Hola, ${currentAdmin.nombre_admin}`;
+
+                renderSucursales();
+                renderSelectSucursales();
+                renderGerentes();
+                renderSelectSucursalesSinGerente();
+                cargarPromociones();
+
+            } catch (error) {
+                console.error("Error cargando dashboard:", error);
+                document.getElementById('admin-saludo').innerText = 'Error al cargar';
+            }
         }
 
-        // Función 2: Mostrar Tabla de Inventario al elegir Sucursal
-        function mostrarInventario(sucursal) {
-            const tableContainer = document.getElementById('inventory-table-container');
-            const title = document.getElementById('inventory-title');
+        // --- RENDER: SUCURSALES ---
+        function renderSucursales() {
+            const grid = document.getElementById('sucursales-grid');
+            grid.innerHTML = '';
 
-            // Si el valor es vacío (placeholder), ocultamos todo
-            if (!sucursal) {
-                tableContainer.style.display = 'none';
+            if (sucursales.length === 0) {
+                grid.innerHTML = '<p style="color: #888;">No hay sucursales registradas.</p>';
                 return;
             }
 
-            // Capitalizar la primera letra para que se vea bonito (norte -> Norte)
-            const nombreBonito = sucursal.charAt(0).toUpperCase() + sucursal.slice(1);
-            
-            // Actualizar título
-            title.innerText = `Inventario actual: Sucursal ${nombreBonito}`;
+            sucursales.forEach(suc => {
+                const card = document.createElement('div');
+                card.className = 'branch-card';
+                card.style.cursor = 'pointer';
+                card.onclick = () => seleccionarSucursal(suc.id_sucursal);
+                card.innerHTML = `
+                    <h3>${suc.nombre_sucursal}</h3>
+                    <p style="color:#888; font-size: 0.9rem;">${suc.direccion || 'Sin dirección'}</p>
+                    <p style="color:#666; font-size: 0.8rem; margin-top: 0.5rem;">
+                        <i class="fas fa-map-marker-alt"></i> ${suc.ciudad || 'N/A'}
+                    </p>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem; color: ${suc.nombre_gerente ? '#27ae60' : '#e74c3c'};">
+                        <i class="fas fa-user-tie"></i> ${suc.nombre_gerente || 'Sin gerente asignado'}
+                    </p>
+                `;
+                grid.appendChild(card);
+            });
+        }
 
-            // Mostrar la tabla
-            tableContainer.style.display = 'block';
+        // --- SELECCIONAR SUCURSAL ---
+        async function seleccionarSucursal(idSucursal) {
+            const sucursal = sucursales.find(s => s.id_sucursal === idSucursal);
+            
+            document.getElementById('branch-details').style.display = 'grid';
+            document.getElementById('gerente-nombre').innerText = sucursal.nombre_gerente || 'Sin asignar';
+            document.getElementById('equipo-titulo').innerText = `Equipo de Trabajo (${sucursal.nombre_sucursal})`;
+
+            try {
+                const res = await fetch(`/api/admin/empleados?id_sucursal=${idSucursal}`);
+                const empleados = await res.json();
+
+                const lista = document.getElementById('empleados-lista');
+                lista.innerHTML = '';
+
+                if (empleados.length === 0) {
+                    lista.innerHTML = '<li style="color: #888; padding: 1rem;">No hay empleados en esta sucursal</li>';
+                    return;
+                }
+
+                empleados.forEach(emp => {
+                    const li = document.createElement('li');
+                    li.style.cssText = 'padding: 0.8rem 0; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center;';
+                    li.innerHTML = `
+                        <i class="fas fa-user" style="margin-right: 10px; color: #d4a5a5;"></i>
+                        ${emp.nombres} ${emp.apellidos} - ${emp.especialidad}
+                        <span style="margin-left: auto; font-size: 0.8rem; color: ${emp.estado === 'Activo' ? 'green' : 'red'};">● ${emp.estado}</span>
+                    `;
+                    lista.appendChild(li);
+                });
+            } catch (error) {
+                console.error("Error cargando empleados:", error);
+            }
+        }
+
+        // --- RENDER: SELECT SUCURSALES ---
+        function renderSelectSucursales() {
+            const select = document.getElementById('sucursalSelectInv');
+            select.innerHTML = '<option value="" selected disabled>-- Elige una Sucursal --</option>';
+            sucursales.forEach(suc => {
+                select.innerHTML += `<option value="${suc.id_sucursal}">${suc.nombre_sucursal}</option>`;
+            });
+        }
+
+        // --- CARGAR INVENTARIO ---
+        async function cargarInventario(idSucursal) {
+            if (!idSucursal) return;
+
+            const container = document.getElementById('inventory-table-container');
+            const title = document.getElementById('inventory-title');
+            const tbody = document.getElementById('inventario-body');
+
+            const sucursal = sucursales.find(s => s.id_sucursal == idSucursal);
+            title.innerText = `Inventario: ${sucursal.nombre_sucursal}`;
+            container.style.display = 'block';
+
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Cargando...</td></tr>';
+
+            try {
+                const res = await fetch(`/api/admin/inventario?id_sucursal=${idSucursal}`);
+                const inventario = await res.json();
+
+                tbody.innerHTML = '';
+
+                if (inventario.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: #888;">No hay productos</td></tr>';
+                    return;
+                }
+
+                inventario.forEach(item => {
+                    let estadoColor = 'green';
+                    if (item.estado === 'Bajo Stock') estadoColor = 'orange';
+                    if (item.estado === 'Agotado') estadoColor = '#d9534f';
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.producto}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.stock_actual} un.</td>
+                        <td>${item.stock_minimo} un.</td>
+                        <td style="color: ${estadoColor}; font-weight: 600;">${item.estado}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Error cargando inventario:", error);
+            }
+        }
+
+        // --- RENDER: GERENTES ---
+        function renderGerentes() {
+            const grid = document.getElementById('gerentes-grid');
+            grid.innerHTML = '';
+
+            if (gerentes.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #888; background: white; border-radius: 12px;">
+                        <i class="fas fa-user-tie" style="font-size: 3rem; margin-bottom: 1rem; color: #ddd;"></i>
+                        <p>No hay gerentes registrados.</p>
+                    </div>`;
+                return;
+            }
+
+            gerentes.forEach(ger => {
+                const card = document.createElement('div');
+                card.style.cssText = 'background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);';
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="fas fa-user-tie" style="font-size: 1.5rem; color: #b58383;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.1rem;">${ger.nombres} ${ger.apellidos}</h3>
+                            <p style="margin: 0; color: #888; font-size: 0.85rem;">${ger.nombre_sucursal || 'Sin sucursal'}</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;">
+                        <p><i class="fas fa-id-card" style="width: 20px;"></i> ${ger.cedula}</p>
+                        ${ger.telefono ? `<p><i class="fas fa-phone" style="width: 20px;"></i> ${ger.telefono}</p>` : ''}
+                    </div>
+                    <button onclick="despedirGerente(${ger.id_empleado}, '${ger.nombres} ${ger.apellidos}')" 
+                            style="width: 100%; padding: 0.6rem; background: none; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-user-times"></i> Despedir
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- RENDER: SELECT SUCURSALES SIN GERENTE ---
+        function renderSelectSucursalesSinGerente() {
+            const select = document.getElementById('gerenteSucursal');
+            select.innerHTML = '<option value="">Selecciona Sucursal</option>';
+
+            if (sucursalesSinGerente.length === 0) {
+                select.innerHTML += '<option value="" disabled>Todas tienen gerente</option>';
+                return;
+            }
+
+            sucursalesSinGerente.forEach(suc => {
+                select.innerHTML += `<option value="${suc.id_sucursal}">${suc.nombre}</option>`;
+            });
+        }
+
+        // --- TOGGLE FORM GERENTE ---
+        function toggleFormGerente() {
+            const form = document.getElementById('form-gerente');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // --- REGISTRAR GERENTE ---
+        async function registrarGerente(e) {
+            e.preventDefault();
+
+            const cedula = document.getElementById('gerenteCedula').value.trim();
+            if (!/^\d{10}$/.test(cedula)) {
+                alert('La cédula debe tener 10 dígitos');
+                return;
+            }
+
+            const data = {
+                id_sucursal: document.getElementById('gerenteSucursal').value,
+                cedula,
+                nombres: document.getElementById('gerenteNombres').value.trim(),
+                apellidos: document.getElementById('gerenteApellidos').value.trim(),
+                telefono: document.getElementById('gerenteTelefono').value.trim() || null,
+                contrasena: document.getElementById('gerenteContrasena').value
+            };
+
+            try {
+                const res = await fetch('/api/admin/gerente', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('✅ Gerente registrado');
+                    document.getElementById('formNuevoGerente').reset();
+                    toggleFormGerente();
+                    loadDashboardData();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error de conexión');
+            }
+        }
+
+        // --- DESPEDIR GERENTE ---
+        async function despedirGerente(idGerente, nombre) {
+            if (!confirm(`¿Despedir a ${nombre}?`)) return;
+
+            try {
+                const res = await fetch(`/api/admin/gerente/${idGerente}`, { method: 'DELETE' });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('Gerente despedido');
+                    loadDashboardData();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error de conexión');
+            }
+        }
+
+        // =============================================
+        // FUNCIONES DE PROMOCIONES
+        // =============================================
+
+        async function cargarPromociones() {
+            try {
+                const res = await fetch('/api/admin/promociones');
+                promociones = await res.json();
+                renderPromociones();
+            } catch (error) {
+                console.error("Error cargando promociones:", error);
+            }
+        }
+
+        function renderPromociones() {
+            const grid = document.getElementById('promociones-grid');
+            grid.innerHTML = '';
+
+            if (promociones.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #888; background: white; border-radius: 12px;">
+                        <i class="fas fa-tags" style="font-size: 3rem; margin-bottom: 1rem; color: #ddd;"></i>
+                        <p>No hay promociones registradas.</p>
+                    </div>`;
+                return;
+            }
+
+            promociones.forEach(promo => {
+                const card = document.createElement('div');
+                card.className = `promo-card ${promo.activa === 'F' ? 'inactive' : ''}`;
+                
+                const fechaInicio = new Date(promo.fecha_inicio).toLocaleDateString('es-ES');
+                const fechaFin = new Date(promo.fecha_fin).toLocaleDateString('es-ES');
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="margin: 0 0 0.5rem 0;">${promo.nombre}</h3>
+                            <span class="promo-badge ${promo.activa === 'V' ? 'badge-active' : 'badge-inactive'}">
+                                ${promo.activa === 'V' ? 'Activa' : 'Inactiva'}
+                            </span>
+                            <span class="promo-badge ${promo.tipo_descuento === 'Porcentaje' ? 'badge-porcentaje' : 'badge-monto'}">
+                                ${promo.tipo_descuento === 'Porcentaje' ? promo.valor_descuento + '%' : '$' + promo.valor_descuento}
+                            </span>
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 0.85rem; margin-bottom: 0.5rem;">${promo.descripcion || 'Sin descripción'}</p>
+                    <p style="color: #888; font-size: 0.8rem; margin-bottom: 1rem;">
+                        <i class="fas fa-calendar"></i> ${fechaInicio} - ${fechaFin}
+                    </p>
+                    <p style="font-size: 0.8rem; color: #666;">
+                        <i class="fas fa-box"></i> ${promo.total_productos} productos &nbsp;
+                        <i class="fas fa-spa"></i> ${promo.total_servicios} servicios
+                    </p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button onclick="verDetallePromocion(${promo.id_promocion})" style="flex: 1; padding: 0.5rem; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        <button onclick="togglePromocion(${promo.id_promocion})" style="flex: 1; padding: 0.5rem; background: ${promo.activa === 'V' ? '#fff3cd' : '#d4edda'}; border: none; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-${promo.activa === 'V' ? 'pause' : 'play'}"></i> ${promo.activa === 'V' ? 'Pausar' : 'Activar'}
+                        </button>
+                        <button onclick="eliminarPromocion(${promo.id_promocion}, '${promo.nombre}')" style="padding: 0.5rem 0.75rem; background: none; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function abrirModalPromocion() {
+            document.getElementById('modalPromocion').style.display = 'flex';
+            document.getElementById('formPromocion').reset();
+
+            // Cargar productos y servicios
+            try {
+                const res = await fetch('/api/admin/promociones/items');
+                const data = await res.json();
+                productosDisponibles = data.productos;
+                serviciosDisponibles = data.servicios;
+
+                // Render checkboxes productos
+                const prodContainer = document.getElementById('productos-checkbox');
+                prodContainer.innerHTML = '';
+                productosDisponibles.forEach(p => {
+                    prodContainer.innerHTML += `
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="productos" value="${p.id_producto}">
+                            ${p.nombre} <span style="color: #888; font-size: 0.75rem;">(${p.categoria})</span>
+                        </label>
+                    `;
+                });
+
+                // Render checkboxes servicios
+                const servContainer = document.getElementById('servicios-checkbox');
+                servContainer.innerHTML = '';
+                serviciosDisponibles.forEach(s => {
+                    servContainer.innerHTML += `
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="servicios" value="${s.id_servicio}">
+                            ${s.nombre} <span style="color: #888; font-size: 0.75rem;">($${s.precio_base})</span>
+                        </label>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error cargando items:", error);
+            }
+        }
+
+        function cerrarModalPromocion() {
+            document.getElementById('modalPromocion').style.display = 'none';
+        }
+
+        async function crearPromocion(e) {
+            e.preventDefault();
+
+            const productosSeleccionados = Array.from(document.querySelectorAll('input[name="productos"]:checked')).map(cb => parseInt(cb.value));
+            const serviciosSeleccionados = Array.from(document.querySelectorAll('input[name="servicios"]:checked')).map(cb => parseInt(cb.value));
+
+            if (productosSeleccionados.length === 0 && serviciosSeleccionados.length === 0) {
+                alert('Debes seleccionar al menos un producto o servicio');
+                return;
+            }
+
+            const data = {
+                nombre: document.getElementById('promoNombre').value.trim(),
+                descripcion: document.getElementById('promoDescripcion').value.trim(),
+                tipo_descuento: document.getElementById('promoTipo').value,
+                valor_descuento: parseFloat(document.getElementById('promoValor').value),
+                fecha_inicio: document.getElementById('promoInicio').value,
+                fecha_fin: document.getElementById('promoFin').value,
+                activa: document.getElementById('promoActiva').checked,
+                productos: productosSeleccionados,
+                servicios: serviciosSeleccionados
+            };
+
+            try {
+                const res = await fetch('/api/admin/promociones', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('✅ Promoción creada exitosamente');
+                    cerrarModalPromocion();
+                    cargarPromociones();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error de conexión');
+            }
+        }
+
+        async function verDetallePromocion(idPromocion) {
+            const promo = promociones.find(p => p.id_promocion === idPromocion);
+            document.getElementById('detalleNombre').innerText = promo.nombre;
+            document.getElementById('modalDetalle').style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/admin/promociones/${idPromocion}`);
+                const detalle = await res.json();
+
+                let html = '';
+                
+                if (detalle.productos.length > 0) {
+                    html += `<h4 style="margin-bottom: 0.5rem;"><i class="fas fa-box"></i> Productos (${detalle.productos.length})</h4>`;
+                    html += '<div class="items-tags">';
+                    detalle.productos.forEach(p => {
+                        html += `<span class="item-tag">${p.nombre}</span>`;
+                    });
+                    html += '</div>';
+                }
+
+                if (detalle.servicios.length > 0) {
+                    html += `<h4 style="margin: 1rem 0 0.5rem;"><i class="fas fa-spa"></i> Servicios (${detalle.servicios.length})</h4>`;
+                    html += '<div class="items-tags">';
+                    detalle.servicios.forEach(s => {
+                        html += `<span class="item-tag">${s.nombre}</span>`;
+                    });
+                    html += '</div>';
+                }
+
+                document.getElementById('detalleContenido').innerHTML = html;
+            } catch (error) {
+                document.getElementById('detalleContenido').innerHTML = '<p style="color: red;">Error al cargar</p>';
+            }
+        }
+
+        function cerrarModalDetalle() {
+            document.getElementById('modalDetalle').style.display = 'none';
+        }
+
+        async function togglePromocion(idPromocion) {
+            try {
+                const res = await fetch(`/api/admin/promociones/${idPromocion}/toggle`, { method: 'PUT' });
+                const result = await res.json();
+
+                if (result.success) {
+                    cargarPromociones();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error de conexión');
+            }
+        }
+
+        async function eliminarPromocion(idPromocion, nombre) {
+            if (!confirm(`¿Eliminar la promoción "${nombre}"?`)) return;
+
+            try {
+                const res = await fetch(`/api/admin/promociones/${idPromocion}`, { method: 'DELETE' });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('Promoción eliminada');
+                    cargarPromociones();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error de conexión');
+            }
+        }
+
+        // --- CAMBIAR PANELES ---
+        function showPanel(panelId, btn) {
+            document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            btn.classList.add('active');
         }
     </script>
 </body>
