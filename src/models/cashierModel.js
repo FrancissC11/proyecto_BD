@@ -1,6 +1,31 @@
 const { getConnection, sql } = require('../config/db');
+const crypto = require('crypto');
 
 const CashierModel = {};
+
+/**
+ * Ejecuta un Stored Procedure dentro de una transacción (o request normal).
+ */
+async function execSp(txOrPool, spName, { inputs = [], outputs = [] } = {}) {
+    const req = new sql.Request(txOrPool);
+    for (const { name, type, value } of inputs) req.input(name, type, value);
+    for (const { name, type } of outputs) req.output(name, type);
+    const res = await req.execute(spName);
+    return { recordsets: res.recordsets, output: res.output };
+}
+
+/**
+ * Ejecuta una query parametrizada dentro de una transacción (o pool).
+ */
+async function execQuery(txOrPool, queryText, inputs = []) {
+    const req = new sql.Request(txOrPool);
+    for (const { name, type, value } of inputs) req.input(name, type, value);
+    return req.query(queryText);
+}
+
+function buildFacturaNumber() {
+    return `F-${Date.now()}-${crypto.randomBytes(2).toString('hex')}`;
+}
 
 // 1. Obtener Info del Cajero y su Sucursal
 CashierModel.getCajeroInfo = async (idEmpleado) => {
@@ -9,15 +34,15 @@ CashierModel.getCajeroInfo = async (idEmpleado) => {
         const result = await pool.request()
             .input('id', sql.Int, idEmpleado)
             .query(`
-                SELECT 
-                    e.id_empleado,
-                    e.nombres + ' ' + e.apellidos as nombre_cajero,
-                    s.id_sucursal,
-                    s.nombre as nombre_sucursal
-                FROM estetica.Empleado e
-                JOIN estetica.Sucursal s ON e.id_sucursal = s.id_sucursal
-                WHERE e.id_empleado = @id
-            `);
+        SELECT 
+          e.id_empleado,
+          e.nombres + ' ' + e.apellidos as nombre_cajero,
+          s.id_sucursal,
+          s.nombre as nombre_sucursal
+        FROM estetica.Empleado e
+        JOIN estetica.Sucursal s ON e.id_sucursal = s.id_sucursal
+        WHERE e.id_empleado = @id
+      `);
         return result.recordset[0];
     } catch (error) {
         console.error("Error en getCajeroInfo:", error);
@@ -32,37 +57,34 @@ CashierModel.getCitasPendientes = async (idSucursal) => {
         const result = await pool.request()
             .input('id_sucursal', sql.Int, idSucursal)
             .query(`
-                SELECT 
-                    c.id_cita, 
-                    ISNULL(CONVERT(varchar(5), c.hora, 108), '00:00') as hora,
-                    cl.id_cliente,
-                    cl.nombres + ' ' + cl.apellidos as cliente,
-                    cl.cedula,
-                    e.nombres + ' ' + e.apellidos as empleado,
-                    e.especialidad,
-                    
-                    -- Buscar el servicio relacionado a la especialidad
-                    ISNULL(s.id_servicio, 1) as id_servicio,
-                    ISNULL(s.nombre, e.especialidad) as servicio_nombre,
-                    ISNULL(s.precio_base, 20.00) as precio_base,
-                    
-                    -- Buscar promoción activa para este servicio
-                    prom.id_promocion,
-                    prom.nombre as promocion_nombre,
-                    prom.tipo_descuento,
-                    prom.valor_descuento
-
-                FROM estetica.Cita c
-                JOIN estetica.Cliente cl ON c.id_cliente = cl.id_cliente
-                JOIN estetica.Empleado e ON c.id_empleado = e.id_empleado
-                LEFT JOIN estetica.Servicio s ON s.nombre LIKE '%' + e.especialidad + '%' AND s.estado = 'Activo'
-                LEFT JOIN estetica.Servicio_Promocion sp ON s.id_servicio = sp.id_servicio
-                LEFT JOIN estetica.Promocion prom ON sp.id_promocion = prom.id_promocion 
-                    AND prom.activa = 'V' 
-                    AND GETDATE() BETWEEN prom.fecha_inicio AND prom.fecha_fin
-                WHERE c.id_sucursal = @id_sucursal AND c.estado = 'Pendiente'
-                ORDER BY c.hora
-            `);
+        SELECT 
+          c.id_cita, 
+          ISNULL(CONVERT(varchar(5), c.hora, 108), '00:00') as hora,
+          cl.id_cliente,
+          cl.nombres + ' ' + cl.apellidos as cliente,
+          cl.cedula,
+          e.nombres + ' ' + e.apellidos as empleado,
+          e.especialidad,
+          
+          ISNULL(s.id_servicio, 1) as id_servicio,
+          ISNULL(s.nombre, e.especialidad) as servicio_nombre,
+          ISNULL(s.precio_base, 20.00) as precio_base,
+          
+          prom.id_promocion,
+          prom.nombre as promocion_nombre,
+          prom.tipo_descuento,
+          prom.valor_descuento
+        FROM estetica.Cita c
+        JOIN estetica.Cliente cl ON c.id_cliente = cl.id_cliente
+        JOIN estetica.Empleado e ON c.id_empleado = e.id_empleado
+        LEFT JOIN estetica.Servicio s ON s.nombre LIKE '%' + e.especialidad + '%' AND s.estado = 'Activo'
+        LEFT JOIN estetica.Servicio_Promocion sp ON s.id_servicio = sp.id_servicio
+        LEFT JOIN estetica.Promocion prom ON sp.id_promocion = prom.id_promocion 
+          AND prom.activa = 'V' 
+          AND GETDATE() BETWEEN prom.fecha_inicio AND prom.fecha_fin
+        WHERE c.id_sucursal = @id_sucursal AND c.estado = 'Pendiente'
+        ORDER BY c.hora
+      `);
         return result.recordset;
     } catch (error) {
         console.error("Error en getCitasPendientes:", error);
@@ -77,30 +99,28 @@ CashierModel.getProductos = async (idSucursal) => {
         const result = await pool.request()
             .input('id_sucursal', sql.Int, idSucursal)
             .query(`
-                SELECT 
-                    p.id_producto, 
-                    p.nombre,
-                    cp.nombre as categoria,
-                    CAST(p.precio_compra * 1.30 AS DECIMAL(10,2)) as precio_base,
-                    i.stock_actual as stock,
-                    
-                    -- Buscar promoción activa para este producto
-                    prom.id_promocion,
-                    prom.nombre as promocion_nombre,
-                    prom.tipo_descuento,
-                    prom.valor_descuento
-
-                FROM estetica.Producto p
-                JOIN estetica.Categoria_Producto cp ON p.id_categoria_producto = cp.id_categoria_producto
-                JOIN estetica.Inventario_Sucursal i ON p.id_producto = i.id_producto
-                LEFT JOIN estetica.Producto_Promocion pp ON p.id_producto = pp.id_producto
-                LEFT JOIN estetica.Promocion prom ON pp.id_promocion = prom.id_promocion 
-                    AND prom.activa = 'V' 
-                    AND GETDATE() BETWEEN prom.fecha_inicio AND prom.fecha_fin
-                WHERE i.id_sucursal = @id_sucursal 
-                  AND i.stock_actual > 0
-                ORDER BY cp.nombre, p.nombre
-            `);
+        SELECT 
+          p.id_producto, 
+          p.nombre,
+          cp.nombre as categoria,
+          CAST(p.precio_compra * 1.30 AS DECIMAL(10,2)) as precio_base,
+          i.stock_actual as stock,
+          
+          prom.id_promocion,
+          prom.nombre as promocion_nombre,
+          prom.tipo_descuento,
+          prom.valor_descuento
+        FROM estetica.Producto p
+        JOIN estetica.Categoria_Producto cp ON p.id_categoria_producto = cp.id_categoria_producto
+        JOIN estetica.Inventario_Sucursal i ON p.id_producto = i.id_producto
+        LEFT JOIN estetica.Producto_Promocion pp ON p.id_producto = pp.id_producto
+        LEFT JOIN estetica.Promocion prom ON pp.id_promocion = prom.id_promocion 
+          AND prom.activa = 'V' 
+          AND GETDATE() BETWEEN prom.fecha_inicio AND prom.fecha_fin
+        WHERE i.id_sucursal = @id_sucursal 
+          AND i.stock_actual > 0
+        ORDER BY cp.nombre, p.nombre
+      `);
         return result.recordset;
     } catch (error) {
         console.error("Error en getProductos:", error);
@@ -114,28 +134,26 @@ CashierModel.getServicios = async () => {
         const pool = await getConnection();
         const result = await pool.request()
             .query(`
-                SELECT 
-                    s.id_servicio,
-                    s.nombre,
-                    cs.nombre as categoria,
-                    s.precio_base,
-                    s.duracion_minutos,
-                    
-                    -- Buscar promoción activa
-                    prom.id_promocion,
-                    prom.nombre as promocion_nombre,
-                    prom.tipo_descuento,
-                    prom.valor_descuento
-
-                FROM estetica.Servicio s
-                JOIN estetica.Categoria_Servicio cs ON s.id_categoria_servicio = cs.id_categoria_servicio
-                LEFT JOIN estetica.Servicio_Promocion sp ON s.id_servicio = sp.id_servicio
-                LEFT JOIN estetica.Promocion prom ON sp.id_promocion = prom.id_promocion 
-                    AND prom.activa = 'V' 
-                    AND GETDATE() BETWEEN prom.fecha_inicio AND prom.fecha_fin
-                WHERE s.estado = 'Activo'
-                ORDER BY cs.nombre, s.nombre
-            `);
+        SELECT 
+          s.id_servicio,
+          s.nombre,
+          cs.nombre as categoria,
+          s.precio_base,
+          s.duracion_minutos,
+          
+          prom.id_promocion,
+          prom.nombre as promocion_nombre,
+          prom.tipo_descuento,
+          prom.valor_descuento
+        FROM estetica.Servicio s
+        JOIN estetica.Categoria_Servicio cs ON s.id_categoria_servicio = cs.id_categoria_servicio
+        LEFT JOIN estetica.Servicio_Promocion sp ON s.id_servicio = sp.id_servicio
+        LEFT JOIN estetica.Promocion prom ON sp.id_promocion = prom.id_promocion 
+          AND prom.activa = 'V' 
+          AND GETDATE() BETWEEN prom.fecha_inicio AND prom.fecha_fin
+        WHERE s.estado = 'Activo'
+        ORDER BY cs.nombre, s.nombre
+      `);
         return result.recordset;
     } catch (error) {
         console.error("Error en getServicios:", error);
@@ -143,7 +161,7 @@ CashierModel.getServicios = async () => {
     }
 };
 
-// 5. PROCESAR VENTA COMPLETA (con descuentos aplicados)
+// 5. PROCESAR VENTA COMPLETA (manteniendo lógica actual, usando SP donde NO rompe el flujo)
 CashierModel.procesarVentaCompleta = async (data) => {
     const pool = await getConnection();
     const transaction = new sql.Transaction(pool);
@@ -153,134 +171,153 @@ CashierModel.procesarVentaCompleta = async (data) => {
 
         let idCliente = data.id_cliente;
 
-        // A. Crear/Buscar Cliente
+        // A. Crear/Buscar Cliente (se mantiene inline)
         if (!idCliente) {
-            const reqCheck = new sql.Request(transaction);
-            const check = await reqCheck.input('cedula', sql.VarChar(10), data.cedula_cliente)
-                .query("SELECT id_cliente FROM estetica.Cliente WHERE cedula = @cedula");
-            
+            const check = await execQuery(transaction,
+                "SELECT id_cliente FROM estetica.Cliente WHERE cedula = @cedula",
+                [{ name: 'cedula', type: sql.VarChar(10), value: data.cedula_cliente }]
+            );
+
             if (check.recordset.length > 0) {
                 idCliente = check.recordset[0].id_cliente;
             } else {
-                const reqIns = new sql.Request(transaction);
-                const nombres = data.nombre_cliente.split(' ');
-                const resIns = await reqIns
-                    .input('cedula', sql.Char(10), data.cedula_cliente)
-                    .input('nombres', sql.VarChar(60), nombres[0] || 'Cliente')
-                    .input('apellidos', sql.VarChar(60), nombres.slice(1).join(' ') || 'General')
-                    .input('telefono', sql.VarChar(10), data.telefono || null)
-                    .input('correo', sql.VarChar(30), data.correo || null)
-                    .query(`
-                        INSERT INTO estetica.Cliente (cedula, nombres, apellidos, telefono, correo) 
-                        VALUES (@cedula, @nombres, @apellidos, @telefono, @correo); 
-                        SELECT SCOPE_IDENTITY() as id;
-                    `);
+                const nombres = String(data.nombre_cliente || '').trim().split(/\s+/).filter(Boolean);
+                const resIns = await execQuery(transaction, `
+          INSERT INTO estetica.Cliente (cedula, nombres, apellidos, telefono, correo) 
+          VALUES (@cedula, @nombres, @apellidos, @telefono, @correo); 
+          SELECT SCOPE_IDENTITY() as id;
+        `, [
+                    { name: 'cedula', type: sql.Char(10), value: data.cedula_cliente },
+                    { name: 'nombres', type: sql.VarChar(60), value: nombres[0] || 'Cliente' },
+                    { name: 'apellidos', type: sql.VarChar(60), value: (nombres.slice(1).join(' ') || 'General') },
+                    { name: 'telefono', type: sql.VarChar(10), value: data.telefono || null },
+                    { name: 'correo', type: sql.VarChar(30), value: data.correo || null },
+                ]);
                 idCliente = resIns.recordset[0].id;
             }
         }
 
         // B. Crear Venta
-        const reqVenta = new sql.Request(transaction);
-        const resVenta = await reqVenta
-            .input('id_sucursal', sql.Int, data.id_sucursal)
-            .input('id_empleado', sql.Int, data.id_cajero)
-            .query(`
-                INSERT INTO estetica.Venta (id_sucursal, id_empleado, fecha_venta, total) 
-                VALUES (@id_sucursal, @id_empleado, CAST(GETDATE() AS DATE), 0); 
-                SELECT SCOPE_IDENTITY() as id;
-            `);
+        // Nota: sp_registrar_venta_simple NO devuelve id_venta en tu backup actual.
+        // Para NO romper nada, mantenemos el INSERT inline (misma lógica que ya te funciona).
+        const resVenta = await execQuery(transaction, `
+      INSERT INTO estetica.Venta (id_sucursal, id_empleado, fecha_venta, total) 
+      VALUES (@id_sucursal, @id_empleado, CAST(GETDATE() AS DATE), 0); 
+      SELECT SCOPE_IDENTITY() as id;
+    `, [
+            { name: 'id_sucursal', type: sql.Int, value: data.id_sucursal },
+            { name: 'id_empleado', type: sql.Int, value: data.id_cajero },
+        ]);
         const idVenta = resVenta.recordset[0].id;
 
         // C. Procesar Productos
-        const productos = data.items.filter(i => i.type === 'PRODUCTO');
+        // Por defecto se mantiene inline para respetar tu subtotal calculado en app.
+        // Si activas USE_SP_DETALLE=1, usará sp_agregar_detalle_venta (cuidado: subtotal=0 y trigger recalcula).
+        const useSpDetalle = String(process.env.USE_SP_DETALLE || '').trim() === '1';
+
+        const productos = (data.items || []).filter(i => i.type === 'PRODUCTO');
         for (const prod of productos) {
-            const reqDet = new sql.Request(transaction);
-            await reqDet
-                .input('id_venta', sql.Int, idVenta)
-                .input('id_prod', sql.Int, prod.id)
-                .input('cant', sql.Int, prod.cantidad)
-                .input('precio', sql.Decimal(10,2), prod.precio_original)
-                .input('descuento', sql.Decimal(10,2), prod.descuento_aplicado || 0)
-                .input('sub', sql.Decimal(10,2), prod.subtotal)
-                .query(`
-                    INSERT INTO estetica.Detalle_Venta (id_venta, id_producto, cantidad, precio_unitario, descuento, subtotal) 
-                    VALUES (@id_venta, @id_prod, @cant, @precio, @descuento, @sub)
-                `);
-        }
-
-        // D. Crear Factura
-        const numFac = `F-${Date.now()}`;
-        const reqFac = new sql.Request(transaction);
-        const resFac = await reqFac
-            .input('id_venta', sql.Int, idVenta)
-            .input('id_cli', sql.Int, idCliente)
-            .input('id_suc', sql.Int, data.id_sucursal)
-            .input('num', sql.VarChar(20), numFac)
-            .query(`
-                INSERT INTO estetica.Factura (id_venta, id_cliente, id_sucursal, num_factura, fecha_emision, subtotal, iva, total) 
-                VALUES (@id_venta, @id_cli, @id_suc, @num, CAST(GETDATE() AS DATE), 0, 0, 0); 
-                SELECT SCOPE_IDENTITY() as id;
-            `);
-        const idFactura = resFac.recordset[0].id;
-
-        // E. Procesar Servicios
-        const servicios = data.items.filter(i => i.type === 'SERVICIO');
-        for (const serv of servicios) {
-            const reqServ = new sql.Request(transaction);
-            await reqServ
-                .input('id_fac', sql.Int, idFactura)
-                .input('id_serv', sql.Int, serv.id_servicio)
-                .input('precio', sql.Decimal(10,2), serv.precio_original)
-                .input('descuento', sql.Decimal(10,2), serv.descuento_aplicado || 0)
-                .input('sub', sql.Decimal(10,2), serv.subtotal)
-                .query(`
-                    INSERT INTO estetica.Servicio_Factura (id_factura, id_servicio, cantidad, precio_unitario, descuento, subtotal) 
-                    VALUES (@id_fac, @id_serv, 1, @precio, @descuento, @sub)
-                `);
-            
-            // Actualizar estado de la cita si viene de una cita
-            if (serv.id_cita) {
-                const reqUpdCita = new sql.Request(transaction);
-                await reqUpdCita
-                    .input('id_cita', sql.Int, serv.id_cita)
-                    .query("UPDATE estetica.Cita SET estado = 'Atendida' WHERE id_cita = @id_cita");
+            if (useSpDetalle) {
+                await execSp(transaction, 'estetica.sp_agregar_detalle_venta', {
+                    inputs: [
+                        { name: 'id_venta', type: sql.Int, value: idVenta },
+                        { name: 'id_producto', type: sql.Int, value: prod.id },
+                        { name: 'cantidad', type: sql.Int, value: prod.cantidad },
+                        { name: 'precio_unitario', type: sql.Decimal(10, 2), value: prod.precio_original },
+                        { name: 'descuento', type: sql.Decimal(10, 2), value: prod.descuento_aplicado || 0 },
+                    ],
+                });
+            } else {
+                await execQuery(transaction, `
+          INSERT INTO estetica.Detalle_Venta (id_venta, id_producto, cantidad, precio_unitario, descuento, subtotal) 
+          VALUES (@id_venta, @id_prod, @cant, @precio, @descuento, @sub)
+        `, [
+                    { name: 'id_venta', type: sql.Int, value: idVenta },
+                    { name: 'id_prod', type: sql.Int, value: prod.id },
+                    { name: 'cant', type: sql.Int, value: prod.cantidad },
+                    { name: 'precio', type: sql.Decimal(10, 2), value: prod.precio_original },
+                    { name: 'descuento', type: sql.Decimal(10, 2), value: prod.descuento_aplicado || 0 },
+                    { name: 'sub', type: sql.Decimal(10, 2), value: prod.subtotal },
+                ]);
             }
         }
 
-        // F. Calcular totales finales
+        // D. Crear Factura (usando SP sp_emitir_factura con OUTPUT, no rompe tu flujo)
+        const numFac = buildFacturaNumber();
+
+        const { output: facOut } = await execSp(transaction, 'estetica.sp_emitir_factura', {
+            inputs: [
+                { name: 'id_venta', type: sql.Int, value: idVenta },
+                { name: 'id_cliente', type: sql.Int, value: idCliente },
+                { name: 'num_factura', type: sql.VarChar(20), value: numFac },
+            ],
+            outputs: [
+                { name: 'id_factura', type: sql.Int },
+            ],
+        });
+        const idFactura = facOut.id_factura;
+
+        // E. Procesar Servicios (se mantiene inline)
+        const servicios = (data.items || []).filter(i => i.type === 'SERVICIO');
+        for (const serv of servicios) {
+            await execQuery(transaction, `
+        INSERT INTO estetica.Servicio_Factura (id_factura, id_servicio, cantidad, precio_unitario, descuento, subtotal) 
+        VALUES (@id_fac, @id_serv, 1, @precio, @descuento, @sub)
+      `, [
+                { name: 'id_fac', type: sql.Int, value: idFactura },
+                { name: 'id_serv', type: sql.Int, value: serv.id_servicio },
+                { name: 'precio', type: sql.Decimal(10, 2), value: serv.precio_original },
+                { name: 'descuento', type: sql.Decimal(10, 2), value: serv.descuento_aplicado || 0 },
+                { name: 'sub', type: sql.Decimal(10, 2), value: serv.subtotal },
+            ]);
+
+            if (serv.id_cita) {
+                await execQuery(transaction,
+                    "UPDATE estetica.Cita SET estado = 'Atendida' WHERE id_cita = @id_cita",
+                    [{ name: 'id_cita', type: sql.Int, value: serv.id_cita }]
+                );
+            }
+        }
+
+        // F. Calcular totales finales (se mantiene tu fuente de verdad actual)
         const subtotalFinal = data.subtotal;
         const ivaFinal = data.iva;
         const totalFinal = data.total;
 
         // Actualizar Venta
-        const reqUpdV = new sql.Request(transaction);
-        await reqUpdV
-            .input('id', sql.Int, idVenta)
-            .input('total', sql.Decimal(10,2), subtotalFinal)
-            .query("UPDATE estetica.Venta SET total = @total WHERE id_venta = @id");
+        await execQuery(transaction,
+            "UPDATE estetica.Venta SET total = @total WHERE id_venta = @id",
+            [
+                { name: 'id', type: sql.Int, value: idVenta },
+                { name: 'total', type: sql.Decimal(10, 2), value: subtotalFinal },
+            ]
+        );
 
         // Actualizar Factura
-        const reqUpdF = new sql.Request(transaction);
-        await reqUpdF
-            .input('id', sql.Int, idFactura)
-            .input('sub', sql.Decimal(10,2), subtotalFinal)
-            .input('iva', sql.Decimal(10,2), ivaFinal)
-            .input('tot', sql.Decimal(10,2), totalFinal)
-            .query("UPDATE estetica.Factura SET subtotal = @sub, iva = @iva, total = @tot WHERE id_factura = @id");
+        await execQuery(transaction,
+            "UPDATE estetica.Factura SET subtotal = @sub, iva = @iva, total = @tot WHERE id_factura = @id",
+            [
+                { name: 'id', type: sql.Int, value: idFactura },
+                { name: 'sub', type: sql.Decimal(10, 2), value: subtotalFinal },
+                { name: 'iva', type: sql.Decimal(10, 2), value: ivaFinal },
+                { name: 'tot', type: sql.Decimal(10, 2), value: totalFinal },
+            ]
+        );
 
-        // G. Registrar Pago
-        const reqPago = new sql.Request(transaction);
-        await reqPago
-            .input('id', sql.Int, idFactura)
-            .input('tipo', sql.VarChar(15), data.metodo_pago)
-            .input('monto', sql.Decimal(10,2), totalFinal)
-            .query("INSERT INTO estetica.Pago (id_factura, fecha_pago, tipo_pago, monto) VALUES (@id, CAST(GETDATE() AS DATE), @tipo, @monto)");
+        // G. Registrar Pago (usando SP sp_registrar_pago)
+        await execSp(transaction, 'estetica.sp_registrar_pago', {
+            inputs: [
+                { name: 'id_factura', type: sql.Int, value: idFactura },
+                { name: 'tipo_pago', type: sql.VarChar(15), value: data.metodo_pago },
+                { name: 'monto', type: sql.Decimal(10, 2), value: totalFinal },
+            ],
+        });
 
         await transaction.commit();
         return { success: true, id_factura: idFactura, num_factura: numFac, total: totalFinal };
 
     } catch (error) {
-        await transaction.rollback();
+        try { await transaction.rollback(); } catch (_) { }
         console.error("Error Venta:", error);
         throw error;
     }
